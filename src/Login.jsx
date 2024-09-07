@@ -1,37 +1,75 @@
 import React, { useState } from "react";
 import "./Css/login.css";
 import Lnavbar from "./Components/Lnavbar";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
+import { auth } from "./firebase"; // Ensure this path is correct
 
 const Login = () => {
   const navigate = useNavigate();
+  const auth = getAuth();
+  const [signup, setsignup] = useState(false);
 
   function signin() {
-    const username = document.getElementById("login-username").value;
+    const email = document.getElementById("login-email").value;
     const password = document.getElementById("login-password").value;
 
-    if (username.trim() === "" || password.trim() === "") {
+    if (email.trim() === "" || password.trim() === "") {
       alert("Please fill in all fields.");
       return;
     }
 
-    fetch("http://localhost:3000/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    }).then((res) => {
-      if (res.status === 200) {
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
         navigate("/forgot-password");
-      } else {
+      })
+      .catch((error) => {
+        console.error("Login failed:", error.code, error.message);
         alert("Login failed.");
-      }
-    });
+      });
   }
 
-  const [signup, setsignup] = useState(false);
+  function signupUser() {
+    const email = document.getElementById("signup-email").value;
+    const password = document.getElementById("signup-password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+
+    if (email.trim() === "" || password.trim() === "") {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+
+        // Send verification email
+        sendEmailVerification(user)
+          .then(() => {
+            alert("Verification email sent. Please check your inbox.");
+          })
+          .catch((error) => {
+            console.error("Error sending email verification:", error);
+            alert("Failed to send verification email.");
+          });
+      })
+      .catch((error) => {
+        console.error("Error during sign up:", error);
+        alert("Sign up failed. Please try again.");
+      });
+  }
+
   return (
     <>
       <div className="main-container">
@@ -45,7 +83,6 @@ const Login = () => {
               >
                 Login
               </div>
-
               <div
                 className={`login auth-common ${signup ? "activesignup" : ""}`}
                 onClick={() => setsignup(true)}
@@ -63,10 +100,10 @@ const Login = () => {
               >
                 <div className={`inputs  ${signup ? "signcssinputs" : ""}`}>
                   <input
-                    type="text"
-                    name="username"
-                    id="login-username"
-                    placeholder="Username"
+                    type="email"
+                    name="email"
+                    id="login-email"
+                    placeholder="Email"
                     className="input-field"
                   />
                   <input
@@ -81,9 +118,7 @@ const Login = () => {
                 <button
                   className="login-btn"
                   type="submit"
-                  onClick={() => {
-                    signin();
-                  }}
+                  onClick={() => signin()}
                 >
                   Login
                 </button>
@@ -100,25 +135,17 @@ const Login = () => {
               >
                 <div className={`inputs  ${signup ? "signcssinputs" : ""}`}>
                   <input
-                    type="text"
-                    name="username"
-                    id="username"
-                    placeholder="Username"
+                    type="email"
+                    name="email"
+                    id="signup-email"
+                    placeholder="Email"
                     className="input-field"
                   />
                   <input
                     type="password"
                     name="password"
-                    id="password"
+                    id="signup-password"
                     placeholder="Password"
-                    className="input-field"
-                  />
-
-                  <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    placeholder="Email"
                     className="input-field"
                   />
                   <input
@@ -130,7 +157,11 @@ const Login = () => {
                   />
                 </div>
 
-                <button className="login-btn" type="submit">
+                <button
+                  className="login-btn"
+                  type="submit"
+                  onClick={() => signupUser()}
+                >
                   Sign up
                 </button>
               </form>
