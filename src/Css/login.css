@@ -1,0 +1,191 @@
+.main-container{
+    height: 100vh;
+    background-color: black;
+}
+.navbar{
+    /* background-color:rebeccapurple; */
+    padding: 25px 0;
+
+}
+.logo{
+    color: white;
+    font-size: 25px;
+    margin-left: 50px;
+}
+.main-auth-box{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* background-color: firebrick; */
+    height: 80vh;
+}
+.auth{
+    height: 450px;
+    width: 500px;
+    background-color: #1E1E1E;
+    position: relative;
+    border-radius: 5%;
+    transition: all 0.3s;
+
+}
+.choice{
+    display: flex;
+    color: white;
+    background-color: #323232;
+    justify-content: space-around;
+    
+    width: min-content;
+    margin: 0 auto;
+    margin-top: 20px;
+    /* padding: 15px 0; */
+    cursor: pointer;
+    border-radius: 15px;
+
+}
+.auth-common{
+    font-size: 17px;
+    border-radius: 10px;
+    
+    padding: 10px 50px;
+    margin: 8px;
+}
+
+
+.inputs{
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s;
+
+    justify-content: space-evenly;
+    height: 180px;
+    /* background-color: rgb(112, 85, 85); */
+}
+.auth-form{
+    /* background-color: firebrick; */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    height: 300px;
+    transition: all 0.3s;
+
+}
+
+.input-field{
+    padding: 15px 0;
+    font-size: 16px;
+    color: white;
+    padding-left: 20px;
+    width: 350px;
+    background-color: #171717;
+    border: none;
+    outline: none;
+    /* margin: 10px 0; */
+    border-radius: 30px;
+}
+
+.login-btn{
+    background-color: #171717;
+    color: white;
+    font-size: 18px;
+    padding: 10px 35px;
+    border-radius: 20px;
+    margin-top: 30px;
+    border: 0;
+    outline: 0;
+    cursor: pointer;
+}
+.forgot-pass{
+    text-align: center;
+
+}
+.forgot-pass a{
+    color: rgb(89, 88, 88);
+    text-decoration: none;
+    font-style: italic;
+}
+.hide{
+    display: none;
+}
+
+.signcss{
+    height: 480px;
+    transition: all 0.3s;
+}
+.signcssinputs{
+    height: 250px;
+    transition: all 0.3s;
+
+}
+.signcssform{
+    height: 350px;
+    transition: all 0.3s;
+
+}
+
+.activelogin{
+    background-color: #1E1E1E;
+}
+
+.activesignup{
+    background-color: #1E1E1E;
+}
+
+.f-pass{
+    width: 280px;
+    margin: 0 auto;
+    background-color: #323232;
+    color: white;
+    text-align: center;
+    margin-top: 20px;
+    padding: 15px 0;
+    border-radius: 15px;
+}
+
+.f-pass-form{
+    /* background-color: darkblue; */
+    display: flex;
+    
+    margin-top: 30px;
+    flex-direction: column;
+    align-items: center;
+    height: 200px;
+    justify-content: center;
+    gap: 30px;
+}
+
+.otp-box{
+    position: relative;
+}
+
+.send-otp{
+    position: 
+    absolute;
+    /* top: 50%; */
+    top: 1%;
+right: 0;
+background-color: #373737;
+border: 0;
+outline: 0;
+border-radius: 20px;
+padding: 16px;
+color: white;
+font-weight: 500;
+}
+
+
+
+.continue button { 
+    padding: 15px 25px;
+    font-size: 17px;
+    background-color: #171717;
+    color: white;
+    border: 0;
+    outline: 0;
+    border-radius: 15px;
+}
+.continue{
+    text-align: center;
+    margin: 30px;
+}
