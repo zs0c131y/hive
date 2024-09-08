@@ -1,38 +1,57 @@
-import React from 'react'
-import './Css/login.css'
-import Lnavbar from './Components/Lnavbar'
-import { Link } from 'react-router-dom'
+import React, { useState } from "react";
+import "./Css/login.css";
+import Lnavbar from "./Components/Lnavbar";
+import { Link, useNavigate } from "react-router-dom";
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
+
 const Forgetpassword = () => {
+  const [email, setEmail] = useState("");
+  const navigate = useNavigate();
+  const auth = getAuth();
+
+  const handlePasswordReset = async (e) => {
+    e.preventDefault();
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert("Reset link is sent to your email.");
+      navigate("/");
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   return (
     <>
-    <div className="main-container">
-        <Lnavbar/>
+      <div className="main-container">
+        <Lnavbar />
         <div className="main-auth-box">
-            <div className="auth">
-                <div className="f-pass">
-                    Forgot Password
-                </div>
+          <div className="auth">
+            <div className="f-pass">Forgot Password</div>
 
-                <form onSubmit={(e)=>{
-                    e.preventDefault()
-                }} action="" className="f-pass-form">
+            <form onSubmit={handlePasswordReset} className="f-pass-form">
+              <input
+                type="email"
+                name="email"
+                id="email"
+                className="input-field"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)} // Set email input
+                required
+              />
 
-                    <input type="email" name="email" id="email" className='input-field' placeholder='Email' />
-
-                    <div className="otp-box">
-                    <input type="text" name="otp" id="otp" className="input-field" placeholder='One Time Password'/>
-                    <button className='send-otp'>Send OTP</button>
-                    </div>
-                </form>
-
-                <div className="continue">
-                    <Link to='/'><button>Continue</button></Link>
-                </div>
-            </div>
+              <div className="continue">
+                <button type="submit" className="send-reset-email">
+                  Send Reset Email
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-    </div>
+      </div>
     </>
-  )
-}
+  );
+};
 
-export default Forgetpassword
+export default Forgetpassword;
