@@ -73,9 +73,27 @@ app.post("/users", async (req, res) => {
 app.post("/requests", async (req, res) => {
   const db = client.db(dbName);
   const requests = db.collection("requests");
+  const now = new Date();
+
+  // Calculate cutoff time for rejected requests
+  const cutoffTime = new Date(now - 24 * 60 * 60 * 1000); // 24 hours ago
+
   const notAcceptedRequests = await requests
-    .find({ status: { $ne: "accepted" } })
+    .find({
+      status: { $ne: "accepted" },
+      $or: [
+        { status: { $ne: "rejected" } },
+        { createdAt: { $gte: cutoffTime } }, // Only include rejected requests within the last 24 hours
+      ],
+    })
     .toArray();
+
+  notAcceptedRequests.forEach((request) => {
+    request.createdAt = new Date(request.createdAt);
+  });
+
+  // Sort requests by createdAt in descending order (newest first)
+  notAcceptedRequests.sort((a, b) => b.createdAt - a.createdAt);
 
   res.json(notAcceptedRequests);
 });
@@ -97,7 +115,6 @@ app.post("/add-request", async (req, res) => {
   }
 });
 
-// Route to update request status
 // Route to update request status
 app.put("/requests/update/:id", async (req, res) => {
   console.log(`Received PUT request for ID: ${req.params.id}`); // Log request ID

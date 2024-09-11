@@ -63,6 +63,7 @@ const Liverequest = () => {
             title: newrequest.title,
             description: newrequest.description,
             status: "", // Initial status
+            createdAt: new Date().toISOString(), // Store UTC time as ISO string
           }),
         });
 
@@ -77,6 +78,7 @@ const Liverequest = () => {
             title: newrequest.title,
             description: newrequest.description,
             status: "", // Initial status
+            createdAt: new Date().toISOString(), // Store UTC time as ISO string
           };
 
           // Update the state with the new request
