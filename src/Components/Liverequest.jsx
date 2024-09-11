@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../Css/home.css";
 import Requestbox from "./Requestbox";
-import { useEffect } from "react";
 
 const Liverequest = () => {
   const [request, setRequest] = useState([]);
@@ -29,8 +28,9 @@ const Liverequest = () => {
 
       const requests = await response.json();
 
-      // Extract only the name, title, and description from each request
+      // Keep the `_id` along with name, title, and description
       const filteredRequests = requests.map((request) => ({
+        id: request._id, // Include the MongoDB ID
         name: request.name,
         title: request.title,
         description: request.description,
@@ -59,8 +59,10 @@ const Liverequest = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            name: "Name", // Add the name here
             title: newrequest.title,
             description: newrequest.description,
+            status: "", // Initial status
           }),
         });
 
@@ -68,8 +70,17 @@ const Liverequest = () => {
           const data = await response.json();
           console.log("Request successfully added:", data);
 
-          // Update the state after successful submission
-          setRequest([...request, newrequest]);
+          // Update the state with the new request including the ID from the server
+          const newRequestWithId = {
+            id: data.requestId, // The ID returned from the server
+            name: "Name", // Include name if needed
+            title: newrequest.title,
+            description: newrequest.description,
+            status: "", // Initial status
+          };
+
+          // Update the state with the new request
+          setRequest([...request, newRequestWithId]);
           setnewrequest({ title: "", description: "" });
           setreqbox(false);
         } else {
@@ -82,24 +93,69 @@ const Liverequest = () => {
     }
   };
 
-  const clicked = (index) => {
+  const clicked = (id) => {
     setaccept(true);
-    setSelectedRequest(index);
+    setSelectedRequest(id); // `id` is now the actual MongoDB ID
   };
 
-  const acceptRequest = () => {
-    setRequest(request.filter((_, index) => index !== selectedRequest));
-    setaccept(false);
+  const acceptRequest = async () => {
+    try {
+      const response = await fetch(`/requests/update/${selectedRequest}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: "accepted" }), // Send the status in the request body
+      });
+
+      if (response.ok) {
+        // Update local state
+        setRequest(request.filter((r) => r.id !== selectedRequest)); // Correctly filter using `id`
+        setaccept(false);
+      } else {
+        console.error(
+          "Failed to update the status on the server.",
+          await response.text()
+        );
+      }
+    } catch (error) {
+      console.error("Error updating the status:", error);
+    }
+  };
+
+  const rejectRequest = async () => {
+    try {
+      const response = await fetch(`/requests/update/${selectedRequest}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: "rejected" }), // Send the status in the request body
+      });
+
+      if (response.ok) {
+        // Update local state
+        // setRequest(request.filter((r) => r.id !== selectedRequest)); // Correctly filter using `id`
+        setaccept(false);
+      } else {
+        console.error(
+          "Failed to update the status on the server.",
+          await response.text()
+        );
+      }
+    } catch (error) {
+      console.error("Error updating the status:", error);
+    }
   };
 
   return (
     <div className="h-lr">
       <div className="request-boxes">
-        {request.map((item, index) => (
+        {request.map((item) => (
           <Requestbox
-            key={index}
+            key={item.id} // Ensure the key is unique
             title={item.title}
-            func={() => clicked(index)}
+            func={() => clicked(item.id)} // Pass the actual request ID here
           />
         ))}
       </div>
@@ -159,21 +215,17 @@ const Liverequest = () => {
       {accept && selectedRequest !== null && (
         <div className="accept-box">
           <img src="../Images/pp.png" alt="" />
-          <div className="accept-title">{request[selectedRequest].title}</div>
-          <div className="accept-description">
-            {request[selectedRequest].description}
+          <div className="accept-title">
+            {request.find((r) => r.id === selectedRequest)?.title}
           </div>
-
+          <div className="accept-description">
+            {request.find((r) => r.id === selectedRequest)?.description}
+          </div>
           <div className="req-btns">
             <button onClick={acceptRequest} className="accept-req">
               Accept
             </button>
-            <button
-              onClick={() => {
-                setaccept(false);
-              }}
-              className="reject-req"
-            >
+            <button onClick={rejectRequest} className="reject-req">
               Reject
             </button>
           </div>
