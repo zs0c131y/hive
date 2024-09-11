@@ -48,9 +48,55 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
-// app.get("/login", (req, res) => {
-//   res.sendFile(path.join(__dirname, "./dist/index.html"));
-// });
+// Route to save user data to MongoDB
+app.post("/users", async (req, res) => {
+  const db = client.db(dbName);
+  const users = db.collection("users");
+
+  try {
+    const { email } = req.body;
+    const user = await users.findOne({ email });
+
+    if (!user) {
+      await users.insertOne({ email });
+    }
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.error("Error saving user data:", error);
+    res.sendStatus(500);
+  }
+});
+
+// Route to fetch all requests
+app.post("/requests", async (req, res) => {
+  const db = client.db(dbName);
+  const requests = db.collection("requests");
+  const notAcceptedRequests = await requests
+    .find({ status: { $ne: "accepted" } })
+    .toArray();
+
+  res.json(notAcceptedRequests);
+});
+
+// Route to add a request
+app.post("/add-request", async (req, res) => {
+  const db = client.db(dbName);
+  const requests = db.collection("requests");
+
+  try {
+    const result = await requests.insertOne(req.body);
+    res
+      .status(200)
+      .json({
+        message: "Request added successfully",
+        requestId: result.insertedId,
+      });
+  } catch (error) {
+    console.error("Error adding request:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 // Feedback for Express server
 app.listen(port, () => {

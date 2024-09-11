@@ -28,6 +28,14 @@
     transition: all 0.3s;
 
 }
+.f-auth{
+    height: 350px;
+    width: 500px;
+    background-color: #1E1E1E;
+    position: relative;
+    border-radius: 5%;
+    transition: all 0.3s;
+}
 .choice{
     display: flex;
     color: white;
@@ -150,29 +158,12 @@
     margin-top: 30px;
     flex-direction: column;
     align-items: center;
-    height: 200px;
+    height: 270px;
     justify-content: center;
     gap: 30px;
 }
 
-.otp-box{
-    position: relative;
-}
 
-.send-otp{
-    position: 
-    absolute;
-    /* top: 50%; */
-    top: 1%;
-right: 0;
-background-color: #373737;
-border: 0;
-outline: 0;
-border-radius: 20px;
-padding: 16px;
-color: white;
-font-weight: 500;
-}
 
 
 
@@ -184,6 +175,7 @@ font-weight: 500;
     border: 0;
     outline: 0;
     border-radius: 15px;
+    cursor: pointer;
 }
 .continue{
     text-align: center;

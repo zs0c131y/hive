@@ -26,7 +26,7 @@ const Forgetpassword = () => {
       <div className="main-container">
         <Lnavbar />
         <div className="main-auth-box">
-          <div className="auth">
+          <div className="f-auth">
             <div className="f-pass">Forgot Password</div>
 
             <form onSubmit={handlePasswordReset} className="f-pass-form">
