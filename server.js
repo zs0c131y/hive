@@ -69,33 +69,42 @@ app.post("/users", async (req, res) => {
   }
 });
 
-// Route to fetch all requests
+// Fetching requests from database
 app.post("/requests", async (req, res) => {
   const db = client.db(dbName);
   const requests = db.collection("requests");
   const now = new Date();
 
-  // Calculate cutoff time for rejected requests
-  const cutoffTime = new Date(now - 24 * 60 * 60 * 1000); // 24 hours ago
+  // Calculate cutoff time for rejected requests and convert to ISO string
+  const cutoffTime = new Date(now - 24 * 60 * 60 * 1000).toISOString();
 
-  const notAcceptedRequests = await requests
-    .find({
-      status: { $ne: "accepted" },
-      $or: [
-        { status: { $ne: "rejected" } },
-        { createdAt: { $gte: cutoffTime } }, // Only include rejected requests within the last 24 hours
-      ],
-    })
-    .toArray();
+  try {
+    const notAcceptedRequests = await requests
+      .find({
+        $or: [
+          // Include all requests that are neither accepted nor rejected
+          {
+            $and: [
+              { status: { $ne: "accepted" } },
+              { status: { $ne: "rejected" } },
+            ],
+          },
+          // Include rejected requests within the last 24 hours
+          { status: "rejected", createdAt: { $gte: cutoffTime } },
+        ],
+      })
+      .toArray();
 
-  notAcceptedRequests.forEach((request) => {
-    request.createdAt = new Date(request.createdAt);
-  });
+    // No need to convert createdAt if it's already a string, just sort
+    notAcceptedRequests.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
 
-  // Sort requests by createdAt in descending order (newest first)
-  notAcceptedRequests.sort((a, b) => b.createdAt - a.createdAt);
-
-  res.json(notAcceptedRequests);
+    res.json(notAcceptedRequests);
+  } catch (error) {
+    console.error("Error fetching requests:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 // Route to add a request

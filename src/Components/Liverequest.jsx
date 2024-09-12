@@ -83,6 +83,7 @@ const Liverequest = () => {
 
           // Update the state with the new request
           setRequest([...request, newRequestWithId]);
+          fetchRequests();
           setnewrequest({ title: "", description: "" });
           setreqbox(false);
         } else {
@@ -111,8 +112,8 @@ const Liverequest = () => {
       });
 
       if (response.ok) {
-        // Update local state
-        setRequest(request.filter((r) => r.id !== selectedRequest)); // Correctly filter using `id`
+        // Re-fetch the requests to update the list without a full page refresh
+        await fetchRequests();
         setaccept(false);
       } else {
         console.error(
@@ -136,8 +137,8 @@ const Liverequest = () => {
       });
 
       if (response.ok) {
-        // Update local state
-        // setRequest(request.filter((r) => r.id !== selectedRequest)); // Correctly filter using `id`
+        // Re-fetch the requests, so the rejected request stays for 24 hours
+        await fetchRequests();
         setaccept(false);
       } else {
         console.error(
