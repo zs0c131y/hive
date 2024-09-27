@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../Css/home.css";
 import Requestbox from "./Requestbox";
 
-const Liverequest = ({ addToHistory }) => {
+const Liverequest = () => {
   const [request, setRequest] = useState([]);
   const [reqbox, setreqbox] = useState(false);
   const [accept, setaccept] = useState(false);
@@ -11,8 +11,7 @@ const Liverequest = ({ addToHistory }) => {
     title: "",
     description: "",
   });
-  const [acceptedData, setAcceptedData] = useState(null);
-  const [history, setHistory] = useState([]);// Added history state
+
   // Function to fetch requests from the server
   async function fetchRequests() {
     try {
@@ -104,7 +103,7 @@ const Liverequest = ({ addToHistory }) => {
 
   const acceptRequest = async () => {
     try {
-      const response = await fetch(`/requests/update/${acceptedData}`, {
+      const response = await fetch(`/requests/update/${selectedRequest}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -113,10 +112,7 @@ const Liverequest = ({ addToHistory }) => {
       });
 
       if (response.ok) {
-         // Find the accepted request
-         const acceptedRequest = request.find((r) => r.id === acceptedData);
-      setAcceptedData(acceptedRequest);
-         setHistory([...history, acceptedRequest]);
+        // Re-fetch the requests to update the list without a full page refresh
         await fetchRequests();
         setaccept(false);
       } else {
@@ -141,13 +137,6 @@ const Liverequest = ({ addToHistory }) => {
       });
 
       if (response.ok) {
-
-         // Find the accepted request
-         const acceptedRequest = request.find((r) => r.id === selectedRequest);
-
-         // Call the function to add the accepted request to history
-         addToHistory(acceptedRequest);
-
         // Re-fetch the requests, so the rejected request stays for 24 hours
         await fetchRequests();
         setaccept(false);
