@@ -10,7 +10,7 @@ import {
 } from "firebase/auth";
 import { auth as firebaseAuth } from "./firebase"; // Ensure this path is correct
 
-const Login = () => {
+const Login = ({setlogin}) => {
   const navigate = useNavigate();
   const auth = getAuth();
   const [signup, setSignup] = useState(false);
@@ -26,6 +26,7 @@ const Login = () => {
 
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
+        setlogin(true)
         navigate("/Home");
       })
       .catch((error) => {

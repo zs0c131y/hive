@@ -4,7 +4,8 @@ import './Css/home.css'
 import Hnavbar from './Components/Hnavbar'
 import Liverequest from './Components/Liverequest'
 import Databank from './Components/Databank'
-const Home = () => {
+import Campusbuzz from './Components/Campusbuzz'
+const Home = ({addToHistory}) => {
 
     const [frame,setframe] = useState("1")
   return (
@@ -28,9 +29,9 @@ const Home = () => {
         </div>
 
 
-        {frame=="1"?<><div><Liverequest/></div></>:""}
+        {frame=="1"?<><div><Liverequest addToHistory={addToHistory}/></div></>:""}
         {frame=="2"?<><div className='options'><Databank/></div></>:""}
-        {frame=="3"?<><div className='options'>yello</div></>:""}
+        {frame=="3"?<><div className='options'><Campusbuzz/></div></>:""}
         {frame=="4"?<><div className='options'>wello</div></>:""}
 
 
