@@ -153,28 +153,6 @@ app.put("/requests/update/:id", async (req, res) => {
   }
 });
 
-// Route to delete a request
-app.delete("/requests/delete/:id", async (req, res) => {
-  console.log(`Received DELETE request for ID: ${req.params.id}`); // Log request ID
-
-  const db = client.db(dbName);
-  const requests = db.collection("requests");
-  const { id } = req.params; // Get the request ID from the URL
-
-  try {
-    const result = await requests.findOneAndDelete({ _id: new ObjectId(id) });
-
-    if (!result.value) {
-      return res.status(404).json({ message: "Request not found" });
-    }
-
-    res.status(200).json({ message: "Request deleted", request: result.value });
-  } catch (error) {
-    console.error("Error deleting request:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
 // Feedback for Express server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

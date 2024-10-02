@@ -1,9 +1,12 @@
-import React from "react";
+import React from 'react';
 
-const History = (props) => {
+
+const History = ({ history }) => {
   return (
-    <div className="user-records">
-      <p>{props.title}</p>
+    <div className='user-records'>
+      <h3>{history.title}</h3>
+     
+      
     </div>
   );
 };
