@@ -10,7 +10,7 @@ import {
 } from "firebase/auth";
 import { auth as firebaseAuth } from "./firebase"; // Ensure this path is correct
 
-const Login = ({setlogin}) => {
+const Login = ({ setlogin }) => {
   const navigate = useNavigate();
   const auth = getAuth();
   const [signup, setSignup] = useState(false);
@@ -26,7 +26,7 @@ const Login = ({setlogin}) => {
 
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        setlogin(true)
+        setlogin(true);
         navigate("/Home");
       })
       .catch((error) => {
@@ -35,14 +35,14 @@ const Login = ({setlogin}) => {
       });
   };
 
-  const saveToMongo = async (email) => {
+  const saveToMongo = async (email, name) => {
     try {
       const response = await fetch("/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, name }),
       });
 
       if (!response.ok) {
@@ -57,6 +57,7 @@ const Login = ({setlogin}) => {
     const email = document.getElementById("signup-email").value;
     const password = document.getElementById("signup-password").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
+    const name = document.getElementById("name").value;
 
     if (password !== confirmPassword) {
       alert("Passwords do not match.");
@@ -117,6 +118,12 @@ const Login = ({setlogin}) => {
                 onSubmit={(e) => e.preventDefault()}
               >
                 <div className={`inputs ${signup ? "signcssinputs" : ""}`}>
+                  <input
+                    type="name"
+                    id="name"
+                    placeholder="Full Name"
+                    className="input-field"
+                  />
                   <input
                     type="email"
                     id="login-email"
