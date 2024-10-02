@@ -119,12 +119,6 @@ const Login = ({ setlogin }) => {
               >
                 <div className={`inputs ${signup ? "signcssinputs" : ""}`}>
                   <input
-                    type="name"
-                    id="name"
-                    placeholder="Full Name"
-                    className="input-field"
-                  />
-                  <input
                     type="email"
                     id="login-email"
                     placeholder="Email"
@@ -149,6 +143,12 @@ const Login = ({ setlogin }) => {
                 onSubmit={(e) => e.preventDefault()}
               >
                 <div className={`inputs ${signup ? "signcssinputs" : ""}`}>
+                  <input
+                    type="name"
+                    id="name"
+                    placeholder="Full Name"
+                    className="input-field"
+                  />
                   <input
                     type="email"
                     id="signup-email"
