@@ -153,6 +153,30 @@ app.put("/requests/update/:id", async (req, res) => {
   }
 });
 
+// Route to fetch user profile by email
+app.post("/profile", async (req, res) => {
+  const db = client.db(dbName);
+  const users = db.collection("users");
+  const { email } = req.body;
+
+  try {
+    const user = await users.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      name: user.name || "No name provided",
+      email: user.email,
+      records: user.records || [], // Assuming you store records with the user
+    });
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 // Feedback for Express server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
