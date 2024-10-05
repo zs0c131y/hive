@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./Css/login.css";
 import Lnavbar from "./Components/Lnavbar";
 import { Link, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -10,7 +11,7 @@ import {
 } from "firebase/auth";
 import { auth as firebaseAuth } from "./firebase"; // Ensure this path is correct
 
-const Login = () => {
+const Login = ({ setlogin }) => {
   const navigate = useNavigate();
   const auth = getAuth();
   const [signup, setSignup] = useState(false);
@@ -26,6 +27,8 @@ const Login = () => {
 
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
+        Cookies.set("userSession", "loggedIn", { expires: 7 }); // Expires in 7 day
+        setlogin(true);
         navigate("/Home");
       })
       .catch((error) => {
@@ -34,14 +37,14 @@ const Login = () => {
       });
   };
 
-  const saveToMongo = async (email) => {
+  const saveToMongo = async (email, name) => {
     try {
       const response = await fetch("/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, name }),
       });
 
       if (!response.ok) {
@@ -56,6 +59,7 @@ const Login = () => {
     const email = document.getElementById("signup-email").value;
     const password = document.getElementById("signup-password").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
+    const name = document.getElementById("name").value;
 
     if (password !== confirmPassword) {
       alert("Passwords do not match.");
@@ -141,6 +145,12 @@ const Login = () => {
                 onSubmit={(e) => e.preventDefault()}
               >
                 <div className={`inputs ${signup ? "signcssinputs" : ""}`}>
+                  <input
+                    type="name"
+                    id="name"
+                    placeholder="Full Name"
+                    className="input-field"
+                  />
                   <input
                     type="email"
                     id="signup-email"
