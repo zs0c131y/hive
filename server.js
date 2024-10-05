@@ -45,10 +45,6 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "./dist/index.html"));
 });
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
-});
-
 // Route to save user data to MongoDB
 app.post("/users", async (req, res) => {
   const db = client.db(dbName);
@@ -126,8 +122,6 @@ app.post("/add-request", async (req, res) => {
 
 // Route to update request status
 app.put("/requests/update/:id", async (req, res) => {
-  console.log(`Received PUT request for ID: ${req.params.id}`); // Log request ID
-
   const db = client.db(dbName);
   const requests = db.collection("requests");
   const { id } = req.params; // Get the request ID from the URL
@@ -175,6 +169,63 @@ app.post("/profile", async (req, res) => {
     console.error("Error fetching user profile:", error);
     res.status(500).json({ message: "Internal server error" });
   }
+});
+
+// Route to add a new buzz event
+app.post("/buzzupdate", async (req, res) => {
+  const db = client.db(dbName);
+  const buzzEvents = db.collection("buzzEvents");
+
+  const { title, description } = req.body;
+
+  if (!title || !description) {
+    return res
+      .status(400)
+      .json({ message: "Title and description are required." });
+  }
+
+  try {
+    const result = await buzzEvents.insertOne({
+      title,
+      description,
+      createdAt: new Date(), // Record the creation time
+    });
+
+    res.status(200).json({
+      message: "Buzz event added successfully",
+      eventId: result.insertedId,
+    });
+  } catch (error) {
+    console.error("Error adding buzz event:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Route to fetch buzz events
+app.post("/getbuzz", async (req, res) => {
+  const db = client.db(dbName);
+  const buzzEvents = db.collection("buzzEvents");
+  const now = new Date();
+  const cutoffTime = new Date(now.getTime() - 24 * 60 * 60 * 1000); // 24 hours ago
+
+  try {
+    const recentEvents = await buzzEvents
+      .find({ createdAt: { $gte: cutoffTime } })
+      .project({ title: 1, description: 1, createdAt: 1 }) // Project specific fields
+      .toArray();
+
+    // Send successful JSON response
+    res.status(200).json(recentEvents);
+  } catch (error) {
+    console.error("Error fetching buzz events:", error);
+
+    // Ensure JSON response even in case of an error
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
 // Feedback for Express server

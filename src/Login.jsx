@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./Css/login.css";
 import Lnavbar from "./Components/Lnavbar";
 import { Link, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -26,6 +27,7 @@ const Login = ({ setlogin }) => {
 
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
+        Cookies.set("userSession", "loggedIn", { expires: 7 }); // Expires in 7 day
         setlogin(true);
         navigate("/Home");
       })

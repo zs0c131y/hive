@@ -12,7 +12,7 @@ const Liverequest = ({ addToHistory }) => {
     description: "",
   });
   const [acceptedData, setAcceptedData] = useState(null);
-  const [history, setHistory] = useState([]);// Added history state
+  const [history, setHistory] = useState([]); // Added history state
   // Function to fetch requests from the server
   async function fetchRequests() {
     try {
@@ -113,10 +113,10 @@ const Liverequest = ({ addToHistory }) => {
       });
 
       if (response.ok) {
-         // Find the accepted request
-         const acceptedRequest = request.find((r) => r.id === acceptedData);
-      setAcceptedData(acceptedRequest);
-         setHistory([...history, acceptedRequest]);
+        // Find the accepted request
+        const acceptedRequest = request.find((r) => r.id === acceptedData);
+        setAcceptedData(acceptedRequest);
+        setHistory([...history, acceptedRequest]);
         await fetchRequests();
         setaccept(false);
       } else {
@@ -141,12 +141,11 @@ const Liverequest = ({ addToHistory }) => {
       });
 
       if (response.ok) {
+        // Find the accepted request
+        const acceptedRequest = request.find((r) => r.id === selectedRequest);
 
-         // Find the accepted request
-         const acceptedRequest = request.find((r) => r.id === selectedRequest);
-
-         // Call the function to add the accepted request to history
-         addToHistory(acceptedRequest);
+        // Call the function to add the accepted request to history
+        addToHistory(acceptedRequest);
 
         // Re-fetch the requests, so the rejected request stays for 24 hours
         await fetchRequests();
