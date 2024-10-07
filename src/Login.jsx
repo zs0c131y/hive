@@ -28,6 +28,7 @@ const Login = ({ setlogin }) => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         Cookies.set("userSession", "loggedIn", { expires: 7 }); // Expires in 7 day
+        Cookies.set("userEmail", email, { expires: 7 }); // Expires in 7 day
         setlogin(true);
         navigate("/Home");
       })

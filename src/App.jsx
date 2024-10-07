@@ -10,6 +10,7 @@ import Error from "./Error";
 
 const App = () => {
   const [login, setlogin] = useState(!!Cookies.get("userSession")); // Check if session cookie exists
+  const [email, setEmail] = useState(Cookies.get("userEmail") || ""); // Retrieve email from cookie
   const [history, setHistory] = useState([]);
 
   const addToHistory = (acceptedRequest) => {
