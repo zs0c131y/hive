@@ -4,14 +4,16 @@ import Hnavbar from "./Components/Hnavbar";
 import History from "./Components/History";
 import Downloads from "./Components/Downloads";
 import Uploads from "./Components/Uploads";
+import Cookies from "js-cookie"; // Assuming you're using this package for cookie handling
 
 const Profile = ({ history }) => {
   const [record, setRecord] = useState("1");
   const [pdata, setPdata] = useState(false);
-  const [profile, setProfile] = useState({ name: "", email: "", records: [] });
+  const [profileName, setProfileName] = useState("");
+  const [email, setEmail] = useState(Cookies.get("userEmail") || "");
 
   useEffect(() => {
-    // Function to fetch profile data
+    // Function to fetch profile name
     const fetchProfile = async () => {
       try {
         const response = await fetch("/profile", {
@@ -20,13 +22,13 @@ const Profile = ({ history }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            email: "adarsh.gupta@bca.christuniversity.in",
-          }), // Replace with the email you're testing with
+            email: email,
+          }),
         });
 
         if (response.ok) {
           const data = await response.json();
-          setProfile(data); // Set the fetched profile data
+          setProfileName(data.name); // Set the fetched profile name
         } else {
           console.error("Error fetching profile");
         }
@@ -36,7 +38,7 @@ const Profile = ({ history }) => {
     };
 
     fetchProfile(); // Call the function when the component mounts
-  }, []);
+  }, [email]);
 
   return (
     <>
@@ -50,7 +52,7 @@ const Profile = ({ history }) => {
                   <img src="./Images/user2.png" alt="" />
                 </div>
                 <div className="profile-data">
-                  <div className="pp-name">{profile.name}</div>{" "}
+                  <div className="pp-name">{profileName}</div>{" "}
                   {/* Display the fetched name */}
                   <div className="pp-buttons">
                     <button className="p-btn">Edit Profile</button>

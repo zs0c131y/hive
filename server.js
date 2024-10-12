@@ -51,17 +51,18 @@ app.post("/users", async (req, res) => {
   const users = db.collection("users");
 
   try {
-    const { email } = req.body;
+    const { email, name } = req.body; // Extract both email and name from request body
+
     const user = await users.findOne({ email });
 
     if (!user) {
-      await users.insertOne({ email });
+      await users.insertOne({ email, name }); // Insert both email and name
     }
 
-    res.sendStatus(200);
+    res.sendStatus(200); // Respond with success
   } catch (error) {
     console.error("Error saving user data:", error);
-    res.sendStatus(500);
+    res.sendStatus(500); // Respond with an error if something goes wrong
   }
 });
 
@@ -91,7 +92,6 @@ app.post("/requests", async (req, res) => {
       })
       .toArray();
 
-    // No need to convert createdAt if it's already a string, just sort
     notAcceptedRequests.sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
@@ -162,8 +162,6 @@ app.post("/profile", async (req, res) => {
 
     res.status(200).json({
       name: user.name || "No name provided",
-      email: user.email,
-      records: user.records || [], // Assuming you store records with the user
     });
   } catch (error) {
     console.error("Error fetching user profile:", error);
@@ -188,7 +186,7 @@ app.post("/buzzupdate", async (req, res) => {
     const result = await buzzEvents.insertOne({
       title,
       description,
-      createdAt: new Date(), // Record the creation time
+      createdAt: new Date(),
     });
 
     res.status(200).json({
@@ -206,12 +204,12 @@ app.post("/getbuzz", async (req, res) => {
   const db = client.db(dbName);
   const buzzEvents = db.collection("buzzEvents");
   const now = new Date();
-  const cutoffTime = new Date(now.getTime() - 24 * 60 * 60 * 1000); // 24 hours ago
+  const cutoffTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
   try {
     const recentEvents = await buzzEvents
       .find({ createdAt: { $gte: cutoffTime } })
-      .project({ title: 1, description: 1, createdAt: 1 }) // Project specific fields
+      .project({ title: 1, description: 1, createdAt: 1 })
       .toArray();
 
     // Send successful JSON response
