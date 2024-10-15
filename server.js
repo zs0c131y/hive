@@ -51,18 +51,18 @@ app.post("/users", async (req, res) => {
   const users = db.collection("users");
 
   try {
-    const { email, name } = req.body; // Extract both email and name from request body
+    const { email, name } = req.body;
 
     const user = await users.findOne({ email });
 
     if (!user) {
-      await users.insertOne({ email, name }); // Insert both email and name
+      await users.insertOne({ email, name });
     }
 
-    res.sendStatus(200); // Respond with success
+    res.sendStatus(200);
   } catch (error) {
     console.error("Error saving user data:", error);
-    res.sendStatus(500); // Respond with an error if something goes wrong
+    res.sendStatus(500);
   }
 });
 
@@ -87,11 +87,12 @@ app.post("/requests", async (req, res) => {
             ],
           },
           // Include rejected requests within the last 24 hours
-          { status: "rejected", createdAt: { $gte: cutoffTime } },
+          { status: "rejected", rejectedAt: { $gte: cutoffTime } },
         ],
       })
       .toArray();
 
+    // Sort the requests by the createdAt date
     notAcceptedRequests.sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
@@ -127,14 +128,36 @@ app.put("/requests/update/:id", async (req, res) => {
   const { id } = req.params; // Get the request ID from the URL
   const { status } = req.body; // Get the new status from the request body
 
+  if (!ObjectId.isValid(id)) {
+    return res.status(400).send("Invalid ObjectId");
+  }
+
+  const objectId = new ObjectId(id);
+
+  let updateFields = {};
+
+  if (status === "accepted") {
+    // Update accepted requests
+    updateFields = {
+      status: "accepted",
+      acceptedAt: new Date(), // Store the time of acceptance
+    };
+  } else if (status === "rejected") {
+    // Update rejected requests
+    updateFields = {
+      status: "rejected",
+      rejectedAt: new Date(), // Store the time of rejection
+    };
+  }
+
   try {
     const result = await requests.findOneAndUpdate(
-      { _id: new ObjectId(id) }, // Find the request by its ID
-      { $set: { status: status } }, // Set the new status
+      { _id: objectId },
+      { $set: updateFields },
       { returnOriginal: false }
     );
 
-    if (!result) {
+    if (!result.value) {
       return res.status(404).json({ message: "Request not found" });
     }
 
@@ -212,12 +235,10 @@ app.post("/getbuzz", async (req, res) => {
       .project({ title: 1, description: 1, createdAt: 1 })
       .toArray();
 
-    // Send successful JSON response
     res.status(200).json(recentEvents);
   } catch (error) {
     console.error("Error fetching buzz events:", error);
 
-    // Ensure JSON response even in case of an error
     res.status(500).json({ message: "Internal server error" });
   }
 });

@@ -3,17 +3,13 @@ import Buzz from "./Buzz";
 import "../Css/home.css";
 
 const Campusbuzz = () => {
-  // State to track the list of events
   const [events, setEvents] = useState([]);
 
-  // State to track whether to show the form
   const [raisebuzz, setraiseBuzz] = useState(false);
 
-  // State to track the event title and description
   const [eventTitle, setEventTitle] = useState("");
   const [eventDescription, setEventDescription] = useState("");
 
-  // State to track which event is currently being viewed
   const [viewEvent, setViewEvent] = useState(null);
 
   // Fetch events from the server when the component mounts
@@ -27,13 +23,6 @@ const Campusbuzz = () => {
         },
         body: JSON.stringify({}), // Empty body for POST
       });
-
-      const contentType = response.headers.get("Content-Type");
-      console.log("Content-Type:", contentType);
-
-      if (!contentType || !contentType.includes("application/json")) {
-        throw new Error("Expected JSON, received something else");
-      }
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -55,7 +44,7 @@ const Campusbuzz = () => {
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent page reload
+    e.preventDefault();
 
     try {
       // Add the new event to the database
@@ -67,7 +56,7 @@ const Campusbuzz = () => {
         body: JSON.stringify({
           title: eventTitle,
           description: eventDescription,
-          createdAt: new Date().toISOString(), // Store the current time
+          createdAt: new Date().toISOString(),
         }),
       });
 
