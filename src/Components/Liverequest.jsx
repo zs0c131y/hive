@@ -69,6 +69,7 @@ const Liverequest = ({ addToHistory }) => {
 
           if (request.status === "rejected" && request.rejectedAt) {
             const rejectedAt = new Date(request.rejectedAt);
+            const now = new Date(); // Make sure 'now' is defined here
             const timeDifference = now - rejectedAt;
             const twentyFourHours = 24 * 60 * 60 * 1000;
             return timeDifference < twentyFourHours; // Show rejected requests for 24 hours
@@ -83,6 +84,10 @@ const Liverequest = ({ addToHistory }) => {
           description: request.description,
           status: request.status,
         }));
+
+      console.log("Rejected At:", rejectedAt);
+      console.log("Time Difference:", timeDifference);
+      console.log("24 Hours in ms:", twentyFourHours);
 
       setRequest(filteredRequests);
     } catch (error) {

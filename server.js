@@ -97,6 +97,8 @@ app.post("/requests", async (req, res) => {
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
 
+    console.log("Not accepted requests:", notAcceptedRequests);
+
     res.json(notAcceptedRequests);
   } catch (error) {
     console.error("Error fetching requests:", error);
