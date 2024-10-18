@@ -5,6 +5,7 @@ import History from "./Components/History";
 import Downloads from "./Components/Downloads";
 import Uploads from "./Components/Uploads";
 import Cookies from "js-cookie"; // Assuming you're using this package for cookie handling
+import { getAuth, signOut } from "firebase/auth"; // Import Firebase authentication methods
 
 const Profile = ({ history }) => {
   const [record, setRecord] = useState("1");
@@ -13,7 +14,6 @@ const Profile = ({ history }) => {
   const [email, setEmail] = useState(Cookies.get("userEmail") || "");
 
   useEffect(() => {
-    // Function to fetch profile name
     const fetchProfile = async () => {
       try {
         const response = await fetch("/profile", {
@@ -28,7 +28,7 @@ const Profile = ({ history }) => {
 
         if (response.ok) {
           const data = await response.json();
-          setProfileName(data.name); // Set the fetched profile name
+          setProfileName(data.name);
         } else {
           console.error("Error fetching profile");
         }
@@ -37,8 +37,22 @@ const Profile = ({ history }) => {
       }
     };
 
-    fetchProfile(); // Call the function when the component mounts
+    fetchProfile();
   }, [email]);
+
+  const handleLogout = () => {
+    const auth = getAuth();
+    signOut(auth)
+      .then(() => {
+        // Clear cookies
+        Cookies.remove("userEmail");
+        // Redirect to the login page or home page after logging out
+        window.location.href = "/";
+      })
+      .catch((error) => {
+        console.error("Error during logout:", error);
+      });
+  };
 
   return (
     <>
@@ -52,8 +66,7 @@ const Profile = ({ history }) => {
                   <img src="./Images/user2.png" alt="" />
                 </div>
                 <div className="profile-data">
-                  <div className="pp-name">{profileName}</div>{" "}
-                  {/* Display the fetched name */}
+                  <div className="pp-name">{profileName}</div>
                   <div className="pp-buttons">
                     <button className="p-btn">Edit Profile</button>
                     <button
@@ -63,6 +76,9 @@ const Profile = ({ history }) => {
                       className="p-btn"
                     >
                       My Records
+                    </button>
+                    <button onClick={handleLogout} className="p-btn">
+                      Logout
                     </button>
                   </div>
                 </div>

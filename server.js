@@ -66,38 +66,30 @@ app.post("/users", async (req, res) => {
   }
 });
 
-// Fetching requests from database
+// Route to fetch requests
 app.post("/requests", async (req, res) => {
   const db = client.db(dbName);
   const requests = db.collection("requests");
   const now = new Date();
-
-  // Calculate cutoff time for rejected requests and convert to ISO string
-  const cutoffTime = new Date(now - 24 * 60 * 60 * 1000).toISOString();
+  const cutoffTime = new Date(now - 24 * 60 * 60 * 1000); // 24 hours ago
 
   try {
     const notAcceptedRequests = await requests
       .find({
         $or: [
-          // Include all requests that are neither accepted nor rejected
+          // Requests that are neither accepted nor rejected
           {
-            $and: [
-              { status: { $ne: "accepted" } },
-              { status: { $ne: "rejected" } },
-            ],
+            status: { $nin: ["accepted", "rejected"] },
           },
-          // Include rejected requests within the last 24 hours
-          { status: "rejected", rejectedAt: { $gte: cutoffTime } },
+          // Include rejected requests if `rejectedAt` is within the last 24 hours
+          {
+            status: "rejected",
+            rejectedAt: { $gte: cutoffTime },
+          },
         ],
       })
+      .sort({ createdAt: -1 }) // Sort by creation date
       .toArray();
-
-    // Sort the requests by the createdAt date
-    notAcceptedRequests.sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    );
-
-    console.log("Not accepted requests:", notAcceptedRequests);
 
     res.json(notAcceptedRequests);
   } catch (error) {

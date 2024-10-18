@@ -4,6 +4,7 @@ import "../Css/home.css";
 import Requestbox from "./Requestbox";
 
 const Liverequest = ({ addToHistory }) => {
+  const [senderdetails, setsenderdetails] = useState(false);
   const [request, setRequest] = useState([]);
   const [reqbox, setreqbox] = useState(false);
   const [accept, setaccept] = useState(false);
@@ -16,6 +17,7 @@ const Liverequest = ({ addToHistory }) => {
   const [email, setEmail] = useState(Cookies.get("userEmail") || "");
   const [name, setName] = useState(""); // State to store the user's name
   const [history, setHistory] = useState([]);
+  const [countdown, setCountdown] = useState(60); // Countdown timer state
 
   // Function to fetch user's name from /profile route using the email stored in cookies
   useEffect(() => {
@@ -84,10 +86,6 @@ const Liverequest = ({ addToHistory }) => {
           description: request.description,
           status: request.status,
         }));
-
-      console.log("Rejected At:", rejectedAt);
-      console.log("Time Difference:", timeDifference);
-      console.log("24 Hours in ms:", twentyFourHours);
 
       setRequest(filteredRequests);
     } catch (error) {
@@ -171,7 +169,21 @@ const Liverequest = ({ addToHistory }) => {
       setAcceptedData(acceptedRequest);
       setHistory([...history, acceptedRequest]);
       await fetchRequests();
-      setaccept(false);
+
+      setsenderdetails(true);
+
+      // Start the countdown timer
+      const countdownInterval = setInterval(() => {
+        setCountdown((prevCountdown) => {
+          if (prevCountdown <= 1) {
+            clearInterval(countdownInterval);
+            setsenderdetails(false);
+            setaccept(false);
+            return 0;
+          }
+          return prevCountdown - 1;
+        });
+      }, 1000);
     } catch (error) {
       console.error("Error updating the status:", error);
     }
@@ -281,14 +293,25 @@ const Liverequest = ({ addToHistory }) => {
           <div className="accept-description">
             {request.find((r) => r.id === selectedRequest)?.description}
           </div>
-          <div className="req-btns">
-            <button onClick={acceptRequest} className="accept-req">
-              Accept
-            </button>
-            <button onClick={rejectRequest} className="reject-req">
-              Reject
-            </button>
-          </div>
+
+          {senderdetails ? (
+            <>
+              <div className="senderdetailbox">
+                {/*add sender email here */}
+                <div className="senderdetails">Please Contact Email</div>
+                <div className="timer">{countdown} seconds remaining</div>
+              </div>
+            </>
+          ) : (
+            <div className="req-btns">
+              <button onClick={acceptRequest} className="accept-req">
+                Accept
+              </button>
+              <button onClick={rejectRequest} className="reject-req">
+                Reject
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
