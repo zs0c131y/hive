@@ -28,6 +28,7 @@ const Login = ({ setlogin }) => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         Cookies.set("userSession", "loggedIn", { expires: 7 }); // Expires in 7 day
+        Cookies.set("userEmail", email, { expires: 7 }); // Expires in 7 day
         setlogin(true);
         navigate("/Home");
       })
@@ -66,16 +67,17 @@ const Login = ({ setlogin }) => {
       return;
     }
 
-    if (email.trim() === "" || password.trim() === "") {
+    if (email.trim() === "" || password.trim() === "" || name.trim() === "") {
       alert("Please fill in all fields.");
       return;
     }
 
-    saveToMongo(email);
-
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
+
+        // Save the user data to MongoDB after successful sign up
+        saveToMongo(email, name);
 
         // Send verification email
         sendEmailVerification(user)

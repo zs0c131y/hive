@@ -4,14 +4,20 @@ import Hnavbar from "./Components/Hnavbar";
 import History from "./Components/History";
 import Downloads from "./Components/Downloads";
 import Uploads from "./Components/Uploads";
+import Cookies from "js-cookie";
+import { getAuth, signOut } from "firebase/auth";
 
 const Profile = ({ history }) => {
   const [record, setRecord] = useState("1");
   const [pdata, setPdata] = useState(false);
-  const [profile, setProfile] = useState({ name: "", email: "", records: [] });
+  const [profileName, setProfileName] = useState("");
+  const [email, setEmail] = useState(Cookies.get("userEmail") || "");
+  const [userHistory, setUserHistory] = useState([]);
+  const [userRecords, setUserRecords] = useState([]);
+  const [downloads, setDownloads] = useState([]);
+  const [uploads, setUploads] = useState([]); // State to hold upload records
 
   useEffect(() => {
-    // Function to fetch profile data
     const fetchProfile = async () => {
       try {
         const response = await fetch("/profile", {
@@ -19,14 +25,12 @@ const Profile = ({ history }) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            email: "adarsh.gupta@bca.christuniversity.in",
-          }), // Replace with the email you're testing with
+          body: JSON.stringify({ email }),
         });
 
         if (response.ok) {
           const data = await response.json();
-          setProfile(data); // Set the fetched profile data
+          setProfileName(data.name);
         } else {
           console.error("Error fetching profile");
         }
@@ -35,8 +39,116 @@ const Profile = ({ history }) => {
       }
     };
 
-    fetchProfile(); // Call the function when the component mounts
-  }, []);
+    fetchProfile();
+  }, [email]);
+
+  const handleLogout = () => {
+    const auth = getAuth();
+    signOut(auth)
+      .then(() => {
+        // Clear cookies
+        Cookies.remove("userEmail");
+        Cookies.remove("userSession"); // Ensure session cookie is cleared
+        // Redirect to the login page after logging out
+        window.location.href = "/";
+      })
+      .catch((error) => {
+        console.error("Error during logout:", error);
+      });
+  };
+
+  const fetchUserRecords = async () => {
+    try {
+      const response = await fetch("/requests", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUserRecords(data);
+      } else {
+        console.error("Error fetching user records");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const fetchUserHistory = async () => {
+    try {
+      const response = await fetch("/requests/history", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ acceptedByEmail: email }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUserHistory(data);
+      } else {
+        console.error("Error fetching user history");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const fetchUserDownloads = async () => {
+    try {
+      const response = await fetch("/requests/downloads", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setDownloads(data);
+      } else {
+        console.error("Error fetching downloads");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  // Fetch user uploads when "Uploads" is clicked
+  const fetchUserUploads = async () => {
+    try {
+      const response = await fetch("/requests/uploads", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUploads(data); // Assuming the response returns an array of upload records
+      } else {
+        console.error("Error fetching uploads");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (email) {
+      fetchUserHistory();
+      fetchUserDownloads();
+      fetchUserUploads();
+    }
+  }, [email]);
 
   return (
     <>
@@ -50,17 +162,20 @@ const Profile = ({ history }) => {
                   <img src="./Images/user2.png" alt="" />
                 </div>
                 <div className="profile-data">
-                  <div className="pp-name">{profile.name}</div>{" "}
-                  {/* Display the fetched name */}
+                  <div className="pp-name">{profileName}</div>
                   <div className="pp-buttons">
                     <button className="p-btn">Edit Profile</button>
                     <button
                       onClick={() => {
                         setPdata((oldValue) => !oldValue);
+                        fetchUserRecords();
                       }}
                       className="p-btn"
                     >
                       My Records
+                    </button>
+                    <button onClick={handleLogout} className="p-btn">
+                      Logout
                     </button>
                   </div>
                 </div>
@@ -69,7 +184,14 @@ const Profile = ({ history }) => {
               <div
                 className={`profile-box-sec-2 ${pdata ? "extra-height" : ""}`}
               >
-                No records.
+                {pdata && userRecords.length === 0 ? "No records." : null}
+                {pdata && userRecords.length > 0 && (
+                  <div className="user-records">
+                    {userRecords.map((record, index) => (
+                      <History key={index} history={record} />
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -80,6 +202,7 @@ const Profile = ({ history }) => {
                   className={`records ${record === "1" ? "lines" : ""}`}
                   onClick={() => {
                     setRecord("1");
+                    fetchUserHistory();
                   }}
                 >
                   History
@@ -88,6 +211,7 @@ const Profile = ({ history }) => {
                   className={`records ${record === "2" ? "lines" : ""}`}
                   onClick={() => {
                     setRecord("2");
+                    fetchUserDownloads();
                   }}
                 >
                   Downloads
@@ -96,6 +220,7 @@ const Profile = ({ history }) => {
                   className={`records ${record === "3" ? "lines" : ""}`}
                   onClick={() => {
                     setRecord("3");
+                    fetchUserUploads(); // Fetch user uploads when "Uploads" is clicked
                   }}
                 >
                   Uploads
@@ -105,8 +230,8 @@ const Profile = ({ history }) => {
             <div className="record-data">
               {record === "1" && (
                 <>
-                  {history.length > 0 ? (
-                    history.map((item, index) => (
+                  {userHistory.length > 0 ? (
+                    userHistory.map((item, index) => (
                       <History key={index} history={item} />
                     ))
                   ) : (
@@ -116,12 +241,24 @@ const Profile = ({ history }) => {
               )}
               {record === "2" && (
                 <>
-                  <Downloads downloads="No downloads." />
+                  {downloads.length > 0 ? (
+                    downloads.map((download, index) => (
+                      <Downloads key={index} download={download} />
+                    ))
+                  ) : (
+                    <p className="user-records">No downloads available.</p>
+                  )}
                 </>
               )}
               {record === "3" && (
                 <>
-                  <Uploads upload="No uploads." />
+                  {uploads.length > 0 ? (
+                    uploads.map((upload, index) => (
+                      <Uploads key={index} upload={upload} />
+                    ))
+                  ) : (
+                    <p className="user-records">No uploads available.</p>
+                  )}
                 </>
               )}
             </div>

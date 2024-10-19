@@ -8,7 +8,7 @@ const Requestbox = (props) => {
       <div className="req-desc">{props.title}</div>
 
       <button onClick={props.func} className="req-accept">
-        Accept
+        Open
       </button>
     </div>
   );
