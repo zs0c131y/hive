@@ -9,7 +9,7 @@ const Hnavbar = () => {
         <Link to="/Home" className="h-logo">Hive</Link>
         <div className="tools">
             <Link to="/Profile" className="h-icons"><img src="../Images/user.png" alt="" /></Link>
-            <div className="h-icons"><img src="../Images/bell.png" alt="" /></div>
+            
         </div>
     </div>
     </>

@@ -4,14 +4,12 @@ import "../Css/home.css";
 
 const Campusbuzz = () => {
   const [events, setEvents] = useState([]);
-
   const [raisebuzz, setraiseBuzz] = useState(false);
-
   const [eventTitle, setEventTitle] = useState("");
   const [eventDescription, setEventDescription] = useState("");
-
   const [viewEvent, setViewEvent] = useState(null);
 
+  // Fetch events from the server when the component mounts
   const fetchEvents = async () => {
     try {
       const response = await fetch("/getbuzz", {
@@ -44,37 +42,41 @@ const Campusbuzz = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Optimistically add the new event to the UI
+    const newEvent = {
+      title: eventTitle,
+      description: eventDescription,
+      createdAt: new Date().toISOString(),
+    };
+
+    // Add it to the state immediately
+    setEvents((prevEvents) => [...prevEvents, newEvent]);
+    setViewEvent(newEvent); // View the new event immediately
+
+    // Reset the form fields
+    setEventTitle("");
+    setEventDescription("");
+    setraiseBuzz(false);
+
     try {
-      // Add the new event to the database
+      // Now, try to update the backend
       const response = await fetch("/buzzupdate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          title: eventTitle,
-          description: eventDescription,
-          createdAt: new Date().toISOString(),
-        }),
+        body: JSON.stringify(newEvent),
       });
 
       if (!response.ok) {
         throw new Error("Failed to post the event");
       }
 
-      const newEvent = await response.json();
-
-      // Update the events state to include the new event
-      setEvents([...events, newEvent]);
-
-      // Reset the form fields
-      setEventTitle("");
-      setEventDescription("");
-
-      // Close the form
-      setraiseBuzz(false);
+      const responseData = await response.json();
+      console.log("Successfully posted event:", responseData);
     } catch (error) {
       console.error("Error posting the event:", error);
+      // Handle error: you may want to rollback the optimistic update
     }
   };
 
@@ -100,7 +102,7 @@ const Campusbuzz = () => {
           }}
           className="request-btn"
         >
-          <img src="../Images/addreq.png" alt="" />
+          <img src="../Images/addreq.png" alt="Add Request" />
         </div>
 
         {/* Form to create a new event */}
@@ -134,12 +136,13 @@ const Campusbuzz = () => {
                   Post
                 </button>
                 <button
+                  type="button"
                   onClick={() => {
                     setraiseBuzz(false);
                   }}
                   className="delete-req"
                 >
-                  Delete
+                  Cancel
                 </button>
               </div>
             </form>
@@ -149,7 +152,7 @@ const Campusbuzz = () => {
         {/* Display event details when View is clicked */}
         {viewEvent && (
           <div className="accept-box">
-            <img src="../Images/pp.png" alt="" />
+            <img src="../Images/pp.png" alt="Event" />
             <div className="accept-title">{viewEvent.title}</div>
             <div className="accept-description">{viewEvent.description}</div>
             <div className="req-btns">
