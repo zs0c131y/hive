@@ -46,7 +46,10 @@ const Profile = ({ history }) => {
     const auth = getAuth();
     signOut(auth)
       .then(() => {
+        // Clear cookies
         Cookies.remove("userEmail");
+        Cookies.remove("userSession"); // Ensure session cookie is cleared
+        // Redirect to the login page after logging out
         window.location.href = "/";
       })
       .catch((error) => {
