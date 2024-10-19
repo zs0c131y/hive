@@ -154,6 +154,13 @@ app.put("/requests/update/:id", async (req, res) => {
       return res.status(404).json({ message: "Request not found" });
     }
 
+    // Check if the user is trying to accept their own request
+    if (requestToAccept.email === byEmail) {
+      return res
+        .status(403)
+        .json({ message: "You cannot accept your own request." });
+    }
+
     // Send email notification with the name and contact information of the acceptor
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -263,6 +270,65 @@ app.post("/getbuzz", async (req, res) => {
   } catch (error) {
     console.error("Error fetching buzz events:", error);
 
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Route to fetch user history by acceptedByEmail
+app.post("/requests/history", async (req, res) => {
+  const db = client.db(dbName);
+  const requests = db.collection("requests");
+  const { acceptedByEmail } = req.body;
+
+  try {
+    // Fetch all requests where acceptedByEmail matches the provided email
+    const historyRecords = await requests.find({ acceptedByEmail }).toArray();
+
+    if (historyRecords.length === 0) {
+      return res.status(404).json({ message: "No history records found." });
+    }
+
+    res.status(200).json(historyRecords);
+  } catch (error) {
+    console.error("Error fetching user history:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Route to fetch download requests based on the downloadedByEmail
+app.post("/requests/downloads", async (req, res) => {
+  const db = client.db(dbName);
+  const requests = db.collection("requests");
+  const { email } = req.body;
+
+  try {
+    const downloadedRequests = await requests
+      .find({ downloadedByEmail: email })
+      .sort({ createdAt: -1 }) // Sort by creation date
+      .toArray();
+
+    res.json(downloadedRequests);
+  } catch (error) {
+    console.error("Error fetching download requests:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Route to fetch upload requests based on the uploadedByEmail
+app.post("/requests/uploads", async (req, res) => {
+  const db = client.db(dbName);
+  const requests = db.collection("requests");
+  const { email } = req.body;
+
+  try {
+    const uploadedRequests = await requests
+      .find({ uploadedByEmail: email }) // Use the appropriate field to filter uploads
+      .sort({ createdAt: -1 }) // Sort by creation date
+      .toArray();
+
+    res.json(uploadedRequests);
+  } catch (error) {
+    console.error("Error fetching upload requests:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });

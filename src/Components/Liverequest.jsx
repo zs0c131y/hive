@@ -161,6 +161,12 @@ const Liverequest = ({ addToHistory }) => {
   };
 
   const acceptRequest = async () => {
+    // Check if the logged-in user is the same as the request creator
+    if (creatorEmail === email) {
+      alert("You cannot accept your own request."); // Alert user
+      return; // Exit early
+    }
+
     try {
       const response = await fetch(`/requests/update/${selectedRequest}`, {
         method: "PUT",
@@ -206,6 +212,12 @@ const Liverequest = ({ addToHistory }) => {
   };
 
   const rejectRequest = async () => {
+    // Check if the logged-in user is the same as the request creator
+    if (creatorEmail === email) {
+      alert("You cannot reject your own request."); // Alert user
+      return; // Exit early
+    }
+
     try {
       const response = await fetch(`/requests/update/${selectedRequest}`, {
         method: "PUT",
