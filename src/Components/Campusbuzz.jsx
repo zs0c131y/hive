@@ -12,8 +12,6 @@ const Campusbuzz = () => {
 
   const [viewEvent, setViewEvent] = useState(null);
 
-  // Fetch events from the server when the component mounts
-
   const fetchEvents = async () => {
     try {
       const response = await fetch("/getbuzz", {

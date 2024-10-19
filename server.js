@@ -161,16 +161,20 @@ app.put("/requests/update/:id", async (req, res) => {
         .json({ message: "You cannot accept your own request." });
     }
 
-    // Send email notification with the name and contact information of the acceptor
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: requestToAccept.email, // The email of the request creator
-      subject: "Your request has been accepted!",
-      text: `Hello ${requestToAccept.name},\n\nYour request titled "${requestToAccept.title}" has been accepted by ${by}. You can contact them at ${byEmail}.\n\nThank you!`,
-    };
+    // Send email notification only if 'by' and 'byEmail' are present
+    if (by && byEmail) {
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: requestToAccept.email, // The email of the request creator
+        subject: "Your request has been accepted!",
+        text: `Hello ${requestToAccept.name},\n\nYour request titled "${requestToAccept.title}" has been accepted by ${by}. You can contact them at ${byEmail}.\n\nThank you!`,
+      };
 
-    // Send the email
-    await transporter.sendMail(mailOptions);
+      // Send the email
+      await transporter.sendMail(mailOptions);
+    } else {
+      console.warn("Email not sent: 'by' or 'byEmail' is missing.");
+    }
   } else if (status === "rejected") {
     updateFields = {
       status: "rejected",
