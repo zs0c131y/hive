@@ -18,6 +18,7 @@ const Liverequest = ({ addToHistory }) => {
   const [name, setName] = useState(""); // State to store the user's name
   const [history, setHistory] = useState([]);
   const [countdown, setCountdown] = useState(60); // Countdown timer state
+  const [creatorEmail, setCreatorEmail] = useState("");
 
   // Function to fetch user's name from /profile route using the email stored in cookies
   useEffect(() => {
@@ -85,6 +86,7 @@ const Liverequest = ({ addToHistory }) => {
           title: request.title,
           description: request.description,
           status: request.status,
+          email: request.email,
         }));
 
       setRequest(filteredRequests);
@@ -110,6 +112,7 @@ const Liverequest = ({ addToHistory }) => {
           },
           body: JSON.stringify({
             name: name || "Anonymous", // Use the fetched name or default to "Anonymous"
+            email: email,
             title: newrequest.title,
             description: newrequest.description,
             status: "", // Initial status
@@ -146,7 +149,15 @@ const Liverequest = ({ addToHistory }) => {
 
   const clicked = (id) => {
     setaccept(true);
-    setSelectedRequest(id); // Set selected request by ID
+    setSelectedRequest(id);
+
+    // Find the request with the matching ID and set the creator's email
+    const selectedReq = request.find((r) => r.id === id);
+    if (selectedReq) {
+      setCreatorEmail(selectedReq.email);
+    } else {
+      console.warn("No request found with the specified ID");
+    }
   };
 
   const acceptRequest = async () => {
@@ -156,7 +167,12 @@ const Liverequest = ({ addToHistory }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status: "accepted" }), // Send the status in the request body
+        body: JSON.stringify({
+          status: "accepted",
+          by: name, // Include the name of the person who accepted the request
+          acceptedAt: new Date().toISOString(), // Record the time of acceptance
+          byEmail: email, // Include the email of the person who accepted the request
+        }),
       });
 
       // Error check
@@ -244,7 +260,7 @@ const Liverequest = ({ addToHistory }) => {
       {reqbox && (
         <div className="req-box-raise">
           <img src="../Images/pp.png" alt="" />
-          <div className="req-user-name">Name</div>
+          <div className="req-user-name">{name}</div>
           <form className="req-form" onSubmit={addrequest}>
             <div className="req-inputs">
               <input
@@ -298,7 +314,11 @@ const Liverequest = ({ addToHistory }) => {
             <>
               <div className="senderdetailbox">
                 {/*add sender email here */}
-                <div className="senderdetails">Please Contact Email</div>
+                <div className="senderdetails">
+                  Please contact{" "}
+                  <a href={`mailto:${creatorEmail}`}>{creatorEmail}</a> to
+                  fulfill the request.
+                </div>
                 <div className="timer">{countdown} seconds remaining</div>
               </div>
             </>
