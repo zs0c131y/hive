@@ -437,6 +437,57 @@ app.get("/download/:filename", (req, res) => {
   });
 });
 
+// Route to add a new campus update
+app.post("/update", async (req, res) => {
+  const db = client.db(dbName);
+  const buzzEvents = db.collection("updates");
+
+  const { title, description } = req.body;
+
+  if (!title || !description) {
+    return res
+      .status(400)
+      .json({ message: "Title and description are required." });
+  }
+
+  try {
+    const result = await buzzEvents.insertOne({
+      title,
+      description,
+      createdAt: new Date(),
+    });
+
+    res.status(200).json({
+      message: "Campus update added successfully",
+      updateId: result.insertedId,
+    });
+  } catch (error) {
+    console.error("Error adding campus update:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Route to fetch updates
+app.post("/updates", async (req, res) => {
+  const db = client.db(dbName);
+  const buzzEvents = db.collection("updates");
+  const now = new Date();
+  const cutoffTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+  try {
+    const recentEvents = await buzzEvents
+      .find()
+      .project({ title: 1, description: 1, createdAt: 1 })
+      .toArray();
+
+    res.status(200).json(recentEvents);
+  } catch (error) {
+    console.error("Error fetching campus updates:", error);
+
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
