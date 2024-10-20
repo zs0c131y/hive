@@ -92,6 +92,8 @@ const Databank = () => {
     formData.append("email", email);
     formData.append("time", new Date());
 
+    console.log("Form Data:", formData.name);
+
     try {
       const response = await fetch("/upload", {
         method: "POST",

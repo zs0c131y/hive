@@ -285,12 +285,12 @@ app.post("/getbuzz", async (req, res) => {
     const recentEvents = await buzzEvents
       .find({ createdAt: { $gte: cutoffTime } })
       .project({ title: 1, description: 1, createdAt: 1 })
+      .sort({ createdAt: -1 }) // Sort by createdAt in descending order
       .toArray();
 
     res.status(200).json(recentEvents);
   } catch (error) {
     console.error("Error fetching buzz events:", error);
-
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -368,6 +368,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
     const uploadsCollection = db.collection("uploads");
     const fileData = {
       email,
+      name: req.body.name,
       title: req.body.title,
       description: req.body.description,
       filename: req.file.filename,
@@ -477,6 +478,8 @@ app.post("/update", async (req, res) => {
     const result = await updateCollection.insertOne({
       title,
       description,
+      name,
+      email,
       createdAt: new Date(),
     });
 
@@ -494,18 +497,17 @@ app.post("/update", async (req, res) => {
 app.post("/updates", async (req, res) => {
   const db = client.db(dbName);
   const updateCollection = db.collection("updates");
-  const now = new Date();
 
   try {
     const recentEvents = await updateCollection
       .find()
-      .project({ title: 1, description: 1, createdAt: 1 })
+      .project({ title: 1, description: 1, createdAt: 1 }) // Select fields to include
+      .sort({ createdAt: -1 }) // Sort by createdAt in descending order
       .toArray();
 
     res.status(200).json(recentEvents);
   } catch (error) {
     console.error("Error fetching campus updates:", error);
-
     res.status(500).json({ message: "Internal server error" });
   }
 });

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Updatesbox from "./Updatesbox";
+import Cookies from "js-cookie";
 
 const Updates = () => {
   const [events, setEvents] = useState([]);
@@ -54,6 +55,7 @@ const Updates = () => {
       const data = await response.json();
       console.log("Fetched events:", data);
 
+      // Set the events state directly from the fetched data
       setEvents(data);
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -62,14 +64,12 @@ const Updates = () => {
   };
 
   useEffect(() => {
-    fetchEvents();
+    fetchEvents(); // Fetch events when component mounts
   }, []);
 
-  // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Optimistically add the new event to the UI
     const newEvent = {
       title: eventTitle,
       description: eventDescription,
@@ -78,9 +78,8 @@ const Updates = () => {
       createdAt: new Date().toISOString(),
     };
 
-    // Add it to the state immediately
-    setEvents((prevEvents) => [...prevEvents, newEvent]);
-    setViewEvent(newEvent); // View the new event immediately
+    // Immediately update the state for UI feedback
+    setEvents((prevEvents) => [newEvent, ...prevEvents]); // Add the new event at the top
 
     // Reset the form fields
     setEventTitle("");
@@ -88,7 +87,6 @@ const Updates = () => {
     setraiseBuzz(false);
 
     try {
-      // Now, try to update the backend
       const response = await fetch("/update", {
         method: "POST",
         headers: {
@@ -101,11 +99,10 @@ const Updates = () => {
         throw new Error("Failed to post the event");
       }
 
-      const responseData = await response.json();
-      console.log("Successfully posted event:", responseData);
+      // Fetch updated events from the server
+      await fetchEvents(); // Ensure the event list is up-to-date from the server
     } catch (error) {
       console.error("Error posting the event:", error);
-      // Handle error: you may want to rollback the optimistic update
     }
   };
 
@@ -113,7 +110,7 @@ const Updates = () => {
     <>
       <div className="h-lr">
         <div className="request-boxes">
-          {/* Dynamically render Buzz components for each event */}
+          {/* Dynamically render Updatesbox components for each event */}
           {events.map((event, index) => (
             <Updatesbox
               key={index}

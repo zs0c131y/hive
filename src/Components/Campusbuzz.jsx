@@ -72,7 +72,7 @@ const Campusbuzz = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Optimistically add the new event to the UI
+    // Optimistically add the new event to the UI at the beginning
     const newEvent = {
       title: eventTitle,
       description: eventDescription,
@@ -81,8 +81,8 @@ const Campusbuzz = () => {
       createdAt: new Date().toISOString(),
     };
 
-    // Add it to the state immediately
-    setEvents((prevEvents) => [...prevEvents, newEvent]);
+    // Add it to the state immediately at the top
+    setEvents((prevEvents) => [newEvent, ...prevEvents]); // Prepend the new event
     setViewEvent(newEvent); // View the new event immediately
 
     // Reset the form fields
@@ -106,9 +106,9 @@ const Campusbuzz = () => {
 
       const responseData = await response.json();
       console.log("Successfully posted event:", responseData);
+      await fetchEvents(); // Fetch the updated events
     } catch (error) {
       console.error("Error posting the event:", error);
-      // Handle error: you may want to rollback the optimistic update
     }
   };
 
