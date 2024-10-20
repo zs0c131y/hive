@@ -404,6 +404,39 @@ app.post("/dbank", async (req, res) => {
   }
 });
 
+app.post("/download", (req, res) => {
+  const { path } = req.body; // Get the file path from the request
+
+  res.download(path, (err) => {
+    if (err) {
+      console.error("Error downloading file:", err);
+      res.status(500).send("Failed to download file.");
+    }
+  });
+});
+
+// Route to download a file
+app.get("/download/:filename", (req, res) => {
+  const { filename } = req.params; // Extract the filename from the request parameters
+  const filePath = path.join(uploadDir, filename); // Construct the full file path
+
+  // Check if the file exists
+  fs.access(filePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      console.error("File not found:", err);
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    // Send the file as a response
+    res.download(filePath, (err) => {
+      if (err) {
+        console.error("Error sending file:", err);
+        res.status(500).json({ message: "Error sending file" });
+      }
+    });
+  });
+});
+
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
 });

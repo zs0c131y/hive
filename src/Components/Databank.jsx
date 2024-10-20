@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import "../Css/Databank.css";
 
 const Databank = () => {
-  const [modal, setModal] = useState(false);
+  const [modal, setModal] = useState(null); // Set to null initially
   const [upload, setUpload] = useState(false);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [fileTitle, setFileTitle] = useState("");
@@ -44,16 +44,16 @@ const Databank = () => {
     const fetchPosts = async () => {
       try {
         const response = await fetch("/dbank", {
-          method: "POST", // Ensure that the method is POST as per your server code
+          method: "POST",
           headers: {
-            "Content-Type": "application/json", // Set content type if needed
+            "Content-Type": "application/json",
           },
         });
 
         if (!response.ok) {
-          const text = await response.text(); // Read response body as text
+          const text = await response.text();
           console.error("Error fetching posts, status:", response.status);
-          console.error("Response text:", text); // Log the raw response
+          console.error("Response text:", text);
           throw new Error("Network response was not ok");
         }
 
@@ -106,10 +106,45 @@ const Databank = () => {
       setFileTitle("");
       setFileDescription("");
       setError(null);
-      setPosts((prevPosts) => [data.file, ...prevPosts]); // Assuming 'data.file' contains the new post info
+      setPosts((prevPosts) => [data.file, ...prevPosts]);
     } catch (error) {
       console.error("Error uploading the file:", error);
       setError("Failed to upload the file. Please try again.");
+    }
+  };
+
+  // Function to handle file download
+  const handleDownload = async () => {
+    if (!modal) return; // Make sure modal is not null
+
+    try {
+      // Use the file path from the modal instead of the ID
+      const response = await fetch(`/download`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ path: modal.path }), // Send the file path
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to download the file.");
+      }
+
+      // Create a blob from the response
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a link element and click it to download
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = modal.title; // Use the title as the file name
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url); // Clean up
+    } catch (error) {
+      console.error("Error downloading the file:", error);
     }
   };
 
@@ -140,8 +175,10 @@ const Databank = () => {
               <div className="accept-title">{modal.title}</div>
               <div className="accept-description">{modal.description}</div>
               <div className="req-btns">
-                <button className="reject-req">Download</button>
-                <button onClick={() => setModal(false)} className="reject-req">
+                <button onClick={handleDownload} className="reject-req">
+                  Download
+                </button>
+                <button onClick={() => setModal(null)} className="reject-req">
                   Close
                 </button>
               </div>
