@@ -115,16 +115,16 @@ const Databank = () => {
 
   // Function to handle file download
   const handleDownload = async () => {
-    if (!modal) return; // Make sure modal is not null
+    if (!modal) return;
 
     try {
-      // Use the file path from the modal instead of the ID
+      // Use the file path from the modal and include the user's email
       const response = await fetch(`/download`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ path: modal.path }), // Send the file path
+        body: JSON.stringify({ path: modal.path, email }),
       });
 
       if (!response.ok) {

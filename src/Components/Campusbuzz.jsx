@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Buzz from "./Buzz";
 import "../Css/home.css";
+import Cookies from "js-cookie";
 
 const Campusbuzz = () => {
   const [events, setEvents] = useState([]);
@@ -9,6 +10,34 @@ const Campusbuzz = () => {
   const [eventDescription, setEventDescription] = useState("");
   const [viewEvent, setViewEvent] = useState(null);
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [email, setEmail] = useState(Cookies.get("userEmail") || "");
+  const [name, setName] = useState("");
+
+  // Fetch the user's profile to get their name
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (email) {
+        try {
+          const response = await fetch("/profile", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setName(data.name);
+          } else {
+            console.error("Error fetching profile");
+          }
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+        }
+      }
+    };
+
+    fetchProfile();
+  }, [email]);
 
   // Fetch events from the server when the component mounts
   const fetchEvents = async () => {
@@ -47,6 +76,8 @@ const Campusbuzz = () => {
     const newEvent = {
       title: eventTitle,
       description: eventDescription,
+      name: name,
+      email: email,
       createdAt: new Date().toISOString(),
     };
 
@@ -117,15 +148,15 @@ const Campusbuzz = () => {
                 className="buzz-img"
                 src="../Images/buzz.png"
                 alt=""
-                onClick={() => document.getElementById('file-upload').click()}
-                style={{ cursor: 'pointer' }} // Makes it look clickable
+                onClick={() => document.getElementById("file-upload").click()}
+                style={{ cursor: "pointer" }} // Makes it look clickable
               />
             )}
 
             <input
               type="file"
               id="file-upload"
-              style={{ display: 'none' }} // Hides the file input
+              style={{ display: "none" }} // Hides the file input
               onChange={(e) => setUploadedFile(e.target.files[0])} // Handle the file upload
             />
 
@@ -159,7 +190,7 @@ const Campusbuzz = () => {
                   type="button"
                   onClick={() => {
                     setraiseBuzz(false);
-                    setUploadedFile(null)
+                    setUploadedFile(null);
                   }}
                   className="delete-req"
                 >

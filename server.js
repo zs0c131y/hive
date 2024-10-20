@@ -3,9 +3,6 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const { MongoClient } = require("mongodb");
 const path = require("path");
-const crypto = require("crypto");
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
 const nodemailer = require("nodemailer");
 const router = express.Router();
 const multer = require("multer");
@@ -250,9 +247,9 @@ app.post("/buzzupdate", async (req, res) => {
   const db = client.db(dbName);
   const buzzEvents = db.collection("buzzEvents");
 
-  const { title, description } = req.body;
+  const { title, description, name, email } = req.body;
 
-  if (!title || !description) {
+  if (!title || !description || !name || !email) {
     return res
       .status(400)
       .json({ message: "Title and description are required." });
@@ -262,6 +259,8 @@ app.post("/buzzupdate", async (req, res) => {
     const result = await buzzEvents.insertOne({
       title,
       description,
+      name,
+      email,
       createdAt: new Date(),
     });
 
@@ -404,15 +403,39 @@ app.post("/dbank", async (req, res) => {
   }
 });
 
-app.post("/download", (req, res) => {
-  const { path } = req.body; // Get the file path from the request
+// Route to handle the file download and ensure email is added to the document
+app.post("/download", async (req, res) => {
+  const { path, email } = req.body;
 
-  res.download(path, (err) => {
-    if (err) {
-      console.error("Error downloading file:", err);
-      res.status(500).send("Failed to download file.");
-    }
-  });
+  try {
+    // Attempt to send the file
+    res.download(path, async (err) => {
+      if (err) {
+        console.error("Error downloading file:", err);
+        return res.status(500).send("Failed to download file.");
+      }
+
+      // If the download was successful, proceed to update the document
+      try {
+        const db = client.db(dbName);
+        const filesCollection = db.collection("uploads");
+
+        // Add the email to the list if it's not already there
+        await filesCollection.updateOne(
+          { path },
+          { $addToSet: { downloadedBy: email } } // Use $addToSet to prevent duplicates
+        );
+        console.log(
+          `Email ${email} added to the download history for path: ${path}`
+        );
+      } catch (updateError) {
+        console.error("Error updating the document with email:", updateError);
+      }
+    });
+  } catch (error) {
+    console.error("Error during the download process:", error);
+    res.status(500).send("Failed to process the download request.");
+  }
 });
 
 // Route to download a file
@@ -440,18 +463,18 @@ app.get("/download/:filename", (req, res) => {
 // Route to add a new campus update
 app.post("/update", async (req, res) => {
   const db = client.db(dbName);
-  const buzzEvents = db.collection("updates");
+  const updateCollection = db.collection("updates");
 
-  const { title, description } = req.body;
+  const { title, description, name, email } = req.body;
 
-  if (!title || !description) {
+  if (!title || !description || !name || !email) {
     return res
       .status(400)
       .json({ message: "Title and description are required." });
   }
 
   try {
-    const result = await buzzEvents.insertOne({
+    const result = await updateCollection.insertOne({
       title,
       description,
       createdAt: new Date(),
@@ -470,12 +493,11 @@ app.post("/update", async (req, res) => {
 // Route to fetch updates
 app.post("/updates", async (req, res) => {
   const db = client.db(dbName);
-  const buzzEvents = db.collection("updates");
+  const updateCollection = db.collection("updates");
   const now = new Date();
-  const cutoffTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
   try {
-    const recentEvents = await buzzEvents
+    const recentEvents = await updateCollection
       .find()
       .project({ title: 1, description: 1, createdAt: 1 })
       .toArray();

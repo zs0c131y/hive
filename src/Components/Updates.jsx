@@ -7,6 +7,34 @@ const Updates = () => {
   const [eventTitle, setEventTitle] = useState("");
   const [eventDescription, setEventDescription] = useState("");
   const [viewEvent, setViewEvent] = useState(null);
+  const [email, setEmail] = useState(Cookies.get("userEmail") || "");
+  const [name, setName] = useState("");
+
+  // Fetch the user's profile to get their name
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (email) {
+        try {
+          const response = await fetch("/profile", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setName(data.name);
+          } else {
+            console.error("Error fetching profile");
+          }
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+        }
+      }
+    };
+
+    fetchProfile();
+  }, [email]);
 
   // Fetch events from the server when the component mounts
   const fetchEvents = async () => {
@@ -45,6 +73,8 @@ const Updates = () => {
     const newEvent = {
       title: eventTitle,
       description: eventDescription,
+      name: name,
+      email: email,
       createdAt: new Date().toISOString(),
     };
 
