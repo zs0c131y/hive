@@ -111,7 +111,10 @@ const Profile = ({ history }) => {
 
       if (response.ok) {
         const data = await response.json();
-        setDownloads(data);
+
+        // Extract titles and store them in the downloads state
+        const titles = data.map((download) => download.title);
+        setDownloads(titles);
       } else {
         console.error("Error fetching downloads");
       }
@@ -133,7 +136,9 @@ const Profile = ({ history }) => {
 
       if (response.ok) {
         const data = await response.json();
-        setUploads(data); // Assuming the response returns an array of upload records
+        // Extract titles and store them in the downloads state
+        const title = data.map((upload) => upload.title);
+        setUploads(title);
       } else {
         console.error("Error fetching uploads");
       }

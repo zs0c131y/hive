@@ -319,12 +319,12 @@ app.post("/requests/history", async (req, res) => {
 // Route to fetch download requests based on the downloadedByEmail
 app.post("/requests/downloads", async (req, res) => {
   const db = client.db(dbName);
-  const requests = db.collection("requests");
+  const requests = db.collection("uploads");
   const { email } = req.body;
 
   try {
     const downloadedRequests = await requests
-      .find({ downloadedByEmail: email })
+      .find({ downloadedBy: email })
       .sort({ createdAt: -1 }) // Sort by creation date
       .toArray();
 
@@ -338,12 +338,12 @@ app.post("/requests/downloads", async (req, res) => {
 // Route to fetch upload requests based on the uploadedByEmail
 app.post("/requests/uploads", async (req, res) => {
   const db = client.db(dbName);
-  const requests = db.collection("requests");
+  const requests = db.collection("uploads");
   const { email } = req.body;
 
   try {
     const uploadedRequests = await requests
-      .find({ uploadedByEmail: email }) // Use the appropriate field to filter uploads
+      .find({ email: email }) // Use the appropriate field to filter uploads
       .sort({ createdAt: -1 }) // Sort by creation date
       .toArray();
 

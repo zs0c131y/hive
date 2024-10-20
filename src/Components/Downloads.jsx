@@ -1,11 +1,9 @@
-import React from 'react'
+import React from "react";
 
-const Downloads = (props) => {
+const Downloads = ({ download }) => {
   return (
-    <>
-    <div className="user-records">{props.downloads}</div>
-    </>
-  )
-}
+    <div className="user-records">{download}</div> // Use 'download' directly
+  );
+};
 
-export default Downloads
+export default Downloads;
