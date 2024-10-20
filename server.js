@@ -369,6 +369,8 @@ app.post("/upload", upload.single("file"), async (req, res) => {
     const uploadsCollection = db.collection("uploads");
     const fileData = {
       email,
+      title: req.body.title,
+      description: req.body.description,
       filename: req.file.filename,
       originalName: req.file.originalname,
       path: req.file.path,
