@@ -8,6 +8,7 @@ const Campusbuzz = () => {
   const [eventTitle, setEventTitle] = useState("");
   const [eventDescription, setEventDescription] = useState("");
   const [viewEvent, setViewEvent] = useState(null);
+  const [uploadedFile, setUploadedFile] = useState(null);
 
   // Fetch events from the server when the component mounts
   const fetchEvents = async () => {
@@ -108,7 +109,26 @@ const Campusbuzz = () => {
         {/* Form to create a new event */}
         {raisebuzz && (
           <div className="req-box-raise">
-            <img className="buzz-img" src="../Images/buzz.png" alt="" />
+            {/* Conditionally render either the file name or the upload icon */}
+            {uploadedFile ? (
+              <div className="uploaded-file-name">{uploadedFile.name}</div>
+            ) : (
+              <img
+                className="buzz-img"
+                src="../Images/buzz.png"
+                alt=""
+                onClick={() => document.getElementById('file-upload').click()}
+                style={{ cursor: 'pointer' }} // Makes it look clickable
+              />
+            )}
+
+            <input
+              type="file"
+              id="file-upload"
+              style={{ display: 'none' }} // Hides the file input
+              onChange={(e) => setUploadedFile(e.target.files[0])} // Handle the file upload
+            />
+
             <form className="req-form" onSubmit={handleSubmit}>
               <div className="req-inputs">
                 <input
@@ -139,6 +159,7 @@ const Campusbuzz = () => {
                   type="button"
                   onClick={() => {
                     setraiseBuzz(false);
+                    setUploadedFile(null)
                   }}
                   className="delete-req"
                 >

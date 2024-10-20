@@ -24,6 +24,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(express.static(path.join(__dirname, "./dist")));
+app.use(express.json());
 
 // MongoDB configuration
 const mongoURI = process.env.MONGO_URI;
@@ -40,6 +41,23 @@ async function connectToMongoDB() {
 }
 
 void connectToMongoDB();
+
+// Ensure the uploads directory exists
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
+
+// Multer configuration for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir); // Save files to the 'uploads' directory
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + "-" + file.originalname); // Append a unique suffix to the original filename
+  },
+});
+const upload = multer({ storage });
 
 // Route for the root URL to serve index.html
 app.get("/", (req, res) => {
@@ -333,6 +351,53 @@ app.post("/requests/uploads", async (req, res) => {
     res.json(uploadedRequests);
   } catch (error) {
     console.error("Error fetching upload requests:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Route for file uploads
+app.post("/upload", upload.single("file"), async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded." });
+    }
+
+    // Save the file details to the database if needed
+    const db = client.db(dbName);
+    const uploadsCollection = db.collection("uploads");
+    const fileData = {
+      email,
+      filename: req.file.filename,
+      originalName: req.file.originalname,
+      path: req.file.path,
+      size: req.file.size,
+      uploadDate: new Date(),
+    };
+
+    await uploadsCollection.insertOne(fileData);
+
+    res.status(200).json({
+      message: "File uploaded successfully.",
+      file: fileData,
+    });
+  } catch (error) {
+    console.error("Error during file upload:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Route to fetch all data from the 'dbank' collection
+app.post("/dbank", async (req, res) => {
+  const db = client.db(dbName);
+  const dbankCollection = db.collection("uploads");
+
+  try {
+    const records = await dbankCollection.find({}).toArray();
+    res.status(200).json(records);
+  } catch (error) {
+    console.error("Error fetching data from database:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
