@@ -15,12 +15,12 @@ const Liverequest = ({ addToHistory }) => {
   });
   const [acceptedData, setAcceptedData] = useState(null);
   const [email, setEmail] = useState(Cookies.get("userEmail") || "");
-  const [name, setName] = useState(""); // State to store the user's name
+  const [name, setName] = useState("");
   const [history, setHistory] = useState([]);
-  const [countdown, setCountdown] = useState(60); // Countdown timer state
+  const [countdown, setCountdown] = useState(30);
   const [creatorEmail, setCreatorEmail] = useState("");
 
-  // Function to fetch user's name from /profile route using the email stored in cookies
+  // Function to fetch user's name
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -29,12 +29,12 @@ const Liverequest = ({ addToHistory }) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email }), // Send email from cookies to fetch profile
+          body: JSON.stringify({ email }),
         });
 
         if (response.ok) {
           const data = await response.json();
-          setName(data.name); // Set the fetched name in the state
+          setName(data.name);
         } else {
           console.error("Error fetching profile");
         }
@@ -44,11 +44,11 @@ const Liverequest = ({ addToHistory }) => {
     };
 
     if (email) {
-      fetchProfile(); // Fetch the profile when the email is available
+      fetchProfile();
     }
   }, [email]);
 
-  // Function to fetch requests from the server
+  // Function to fetch requests
   async function fetchRequests() {
     try {
       const response = await fetch("/requests", {
@@ -72,7 +72,7 @@ const Liverequest = ({ addToHistory }) => {
 
           if (request.status === "rejected" && request.rejectedAt) {
             const rejectedAt = new Date(request.rejectedAt);
-            const now = new Date(); // Make sure 'now' is defined here
+            const now = new Date();
             const timeDifference = now - rejectedAt;
             const twentyFourHours = 24 * 60 * 60 * 1000;
             return timeDifference < twentyFourHours; // Show rejected requests for 24 hours
@@ -111,11 +111,11 @@ const Liverequest = ({ addToHistory }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            name: name || "Anonymous", // Use the fetched name or default to "Anonymous"
+            name: name || "Anonymous",
             email: email,
             title: newrequest.title,
             description: newrequest.description,
-            status: "", // Initial status
+            status: "",
             createdAt: new Date().toISOString(),
           }),
         });
@@ -126,10 +126,10 @@ const Liverequest = ({ addToHistory }) => {
 
           const newRequestWithId = {
             id: data.requestId, // The ID returned from the server
-            name: name || "Anonymous", // Use the user's name
+            name: name || "Anonymous",
             title: newrequest.title,
             description: newrequest.description,
-            status: "", // Initial status
+            status: "",
             createdAt: new Date().toISOString(),
           };
 
@@ -151,7 +151,7 @@ const Liverequest = ({ addToHistory }) => {
     setaccept(true);
     setSelectedRequest(id);
 
-    // Find the request with the matching ID and set the creator's email
+    // Find the request with the matching ID and get the creator's email
     const selectedReq = request.find((r) => r.id === id);
     if (selectedReq) {
       setCreatorEmail(selectedReq.email);
@@ -163,7 +163,7 @@ const Liverequest = ({ addToHistory }) => {
   const acceptRequest = async () => {
     // Check if the logged-in user is the same as the request creator
     if (creatorEmail === email) {
-      alert("You cannot accept your own request."); // Alert user
+      alert("You cannot accept your own request.");
       return; // Exit early
     }
 
@@ -175,9 +175,9 @@ const Liverequest = ({ addToHistory }) => {
         },
         body: JSON.stringify({
           status: "accepted",
-          by: name, // Include the name of the person who accepted the request
-          acceptedAt: new Date().toISOString(), // Record the time of acceptance
-          byEmail: email, // Include the email of the person who accepted the request
+          by: name,
+          acceptedAt: new Date().toISOString(),
+          byEmail: email,
         }),
       });
 
@@ -186,7 +186,6 @@ const Liverequest = ({ addToHistory }) => {
         throw new Error(`Failed to update request: ${await response.text()}`);
       }
 
-      // Update state after a successful response
       const acceptedRequest = request.find((r) => r.id === selectedRequest);
       setAcceptedData(acceptedRequest);
       setHistory([...history, acceptedRequest]);
@@ -194,7 +193,6 @@ const Liverequest = ({ addToHistory }) => {
 
       setsenderdetails(true);
 
-      // Start the countdown timer
       const countdownInterval = setInterval(() => {
         setCountdown((prevCountdown) => {
           if (prevCountdown <= 1) {
@@ -212,9 +210,8 @@ const Liverequest = ({ addToHistory }) => {
   };
 
   const rejectRequest = async () => {
-    // Check if the logged-in user is the same as the request creator
     if (creatorEmail === email) {
-      alert("You cannot reject your own request."); // Alert user
+      alert("You cannot reject your own request.");
       return; // Exit early
     }
 
@@ -224,7 +221,7 @@ const Liverequest = ({ addToHistory }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status: "rejected" }), // Send the status in the request body
+        body: JSON.stringify({ status: "rejected" }),
       });
 
       if (response.ok) {
@@ -253,9 +250,9 @@ const Liverequest = ({ addToHistory }) => {
       <div className="request-boxes">
         {request.map((item) => (
           <Requestbox
-            key={item.id} // Ensure the key is unique
+            key={item.id}
             title={item.title}
-            func={() => clicked(item.id)} // Pass the actual request ID here
+            func={() => clicked(item.id)}
           />
         ))}
       </div>

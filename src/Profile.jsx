@@ -15,7 +15,7 @@ const Profile = ({ history }) => {
   const [userHistory, setUserHistory] = useState([]);
   const [userRecords, setUserRecords] = useState([]);
   const [downloads, setDownloads] = useState([]);
-  const [uploads, setUploads] = useState([]); // State to hold upload records
+  const [uploads, setUploads] = useState([]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -48,8 +48,7 @@ const Profile = ({ history }) => {
       .then(() => {
         // Clear cookies
         Cookies.remove("userEmail");
-        Cookies.remove("userSession"); // Ensure session cookie is cleared
-        // Redirect to the login page after logging out
+        Cookies.remove("userSession");
         window.location.href = "/";
       })
       .catch((error) => {
@@ -123,7 +122,6 @@ const Profile = ({ history }) => {
     }
   };
 
-  // Fetch user uploads when "Uploads" is clicked
   const fetchUserUploads = async () => {
     try {
       const response = await fetch("/requests/uploads", {
@@ -136,7 +134,7 @@ const Profile = ({ history }) => {
 
       if (response.ok) {
         const data = await response.json();
-        // Extract titles and store them in the downloads state
+        // Extract titles and store them in the uploads state
         const title = data.map((upload) => upload.title);
         setUploads(title);
       } else {
@@ -225,7 +223,7 @@ const Profile = ({ history }) => {
                   className={`records ${record === "3" ? "lines" : ""}`}
                   onClick={() => {
                     setRecord("3");
-                    fetchUserUploads(); // Fetch user uploads when "Uploads" is clicked
+                    fetchUserUploads();
                   }}
                 >
                   Uploads

@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import "../Css/Databank.css";
 
 const Databank = () => {
-  const [modal, setModal] = useState(null); // Set to null initially
+  const [modal, setModal] = useState(null);
   const [upload, setUpload] = useState(false);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [fileTitle, setFileTitle] = useState("");
@@ -13,7 +13,7 @@ const Databank = () => {
   const [name, setName] = useState("");
   const [posts, setPosts] = useState([]);
 
-  // Fetch the user's profile to get their name
+  // Fetch the user's name
   useEffect(() => {
     const fetchProfile = async () => {
       if (email) {
@@ -39,7 +39,7 @@ const Databank = () => {
     fetchProfile();
   }, [email]);
 
-  // Fetch posts from the /dbank endpoint
+  // Fetch databank posts
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -120,7 +120,6 @@ const Databank = () => {
     if (!modal) return;
 
     try {
-      // Use the file path from the modal and include the user's email
       const response = await fetch(`/download`, {
         method: "POST",
         headers: {
