@@ -1,19 +1,22 @@
-import React from 'react'
-import '../Css/home.css'
-import { Link } from 'react-router-dom'
-import Profile from '../Profile'
+import React from "react";
+import "../Css/home.css";
+import { Link } from "react-router-dom";
+import Profile from "../Profile";
 const Hnavbar = () => {
   return (
     <>
-    <div className="hnavbar">
-        <Link to="/Home" className="h-logo">Hive</Link>
+      <div className="hnavbar">
+        <Link to="/Home" className="h-logo">
+          Hive
+        </Link>
         <div className="tools">
-            <Link to="/Profile" className="h-icons"><img src="../Images/user.png" alt="" /></Link>
-            <div className="h-icons"><img src="../Images/bell.png" alt="" /></div>
+          <Link to="/Profile" className="h-icons">
+            <img src="../Images/user.png" alt="" />
+          </Link>
         </div>
-    </div>
+      </div>
     </>
-  )
-}
+  );
+};
 
-export default Hnavbar  
+export default Hnavbar;

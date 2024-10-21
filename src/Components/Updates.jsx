@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
-import Buzz from "./Buzz";
-import "../Css/home.css";
+import Updatesbox from "./Updatesbox";
 import Cookies from "js-cookie";
 
-const Campusbuzz = () => {
+const Updates = () => {
   const [events, setEvents] = useState([]);
   const [raisebuzz, setraiseBuzz] = useState(false);
   const [eventTitle, setEventTitle] = useState("");
   const [eventDescription, setEventDescription] = useState("");
   const [viewEvent, setViewEvent] = useState(null);
-  const [uploadedFile, setUploadedFile] = useState(null);
   const [email, setEmail] = useState(Cookies.get("userEmail") || "");
   const [name, setName] = useState("");
 
@@ -39,10 +37,10 @@ const Campusbuzz = () => {
     fetchProfile();
   }, [email]);
 
-  // Fetch events from the server when the component mounts
+  // Fetch updates from the server when the component mounts
   const fetchEvents = async () => {
     try {
-      const response = await fetch("/getbuzz", {
+      const response = await fetch("/updates", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -57,6 +55,7 @@ const Campusbuzz = () => {
       const data = await response.json();
       console.log("Fetched events:", data);
 
+      // Set the events state directly from the fetched data
       setEvents(data);
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -65,10 +64,9 @@ const Campusbuzz = () => {
   };
 
   useEffect(() => {
-    fetchEvents();
+    fetchEvents(); // Fetch events when component mounts
   }, []);
 
-  // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -80,16 +78,14 @@ const Campusbuzz = () => {
       createdAt: new Date().toISOString(),
     };
 
-    // Add it to the state immediately at the top
     setEvents((prevEvents) => [newEvent, ...prevEvents]);
-    setViewEvent(newEvent);
 
     setEventTitle("");
     setEventDescription("");
     setraiseBuzz(false);
 
     try {
-      const response = await fetch("/buzzupdate", {
+      const response = await fetch("/update", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -101,8 +97,6 @@ const Campusbuzz = () => {
         throw new Error("Failed to post the event");
       }
 
-      const responseData = await response.json();
-      console.log("Successfully posted event:", responseData);
       await fetchEvents();
     } catch (error) {
       console.error("Error posting the event:", error);
@@ -114,7 +108,7 @@ const Campusbuzz = () => {
       <div className="h-lr">
         <div className="request-boxes">
           {events.map((event, index) => (
-            <Buzz
+            <Updatesbox
               key={index}
               title={event.title}
               description={event.description}
@@ -134,25 +128,7 @@ const Campusbuzz = () => {
 
         {raisebuzz && (
           <div className="req-box-raise">
-            {uploadedFile ? (
-              <div className="uploaded-file-name">{uploadedFile.name}</div>
-            ) : (
-              <img
-                className="buzz-img"
-                src="../Images/buzz.png"
-                alt=""
-                onClick={() => document.getElementById("file-upload").click()}
-                style={{ cursor: "pointer" }}
-              />
-            )}
-
-            <input
-              type="file"
-              id="file-upload"
-              style={{ display: "none" }}
-              onChange={(e) => setUploadedFile(e.target.files[0])}
-            />
-
+            <img className="buzz-img" src="../Images/buzz.png" alt="" />
             <form className="req-form" onSubmit={handleSubmit}>
               <div className="req-inputs">
                 <input
@@ -183,7 +159,6 @@ const Campusbuzz = () => {
                   type="button"
                   onClick={() => {
                     setraiseBuzz(false);
-                    setUploadedFile(null);
                   }}
                   className="delete-req"
                 >
@@ -216,4 +191,4 @@ const Campusbuzz = () => {
   );
 };
 
-export default Campusbuzz;
+export default Updates;

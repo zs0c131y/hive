@@ -9,18 +9,17 @@ import Profile from "./Profile";
 import Error from "./Error";
 
 const App = () => {
-  const [login, setlogin] = useState(!!Cookies.get("userSession")); // Check if session cookie exists
-  const [email, setEmail] = useState(Cookies.get("userEmail") || ""); // Retrieve email from cookie
+  const [login, setlogin] = useState(!!Cookies.get("userSession"));
+  const [email, setEmail] = useState(Cookies.get("userEmail") || "");
   const [history, setHistory] = useState([]);
 
   const addToHistory = (acceptedRequest) => {
     setHistory((prevHistory) => [...prevHistory, acceptedRequest]);
   };
 
-  // Optionally, handle logout by clearing the session cookie
   const handleLogout = () => {
-    Cookies.remove("userSession"); // Remove the session cookie
-    setlogin(false); // Update login state
+    Cookies.remove("userSession");
+    setlogin(false);
   };
 
   return (
