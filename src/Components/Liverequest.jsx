@@ -329,7 +329,6 @@ const Liverequest = ({ addToHistory }) => {
           {senderdetails ? (
             <>
               <div className="senderdetailbox">
-                {/*add sender email here */}
                 <div className="senderdetails">
                   Please contact{" "}
                   <a href={`mailto:${creatorEmail}`}>{creatorEmail}</a> to
