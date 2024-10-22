@@ -15,7 +15,7 @@ const Profile = ({ history }) => {
   const [userHistory, setUserHistory] = useState([]);
   const [userRecords, setUserRecords] = useState([]);
   const [downloads, setDownloads] = useState([]);
-  const [uploads, setUploads] = useState([]); // State to hold upload records
+  const [uploads, setUploads] = useState([]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -169,7 +169,6 @@ const Profile = ({ history }) => {
                 <div className="profile-data">
                   <div className="pp-name">{profileName}</div>
                   <div className="pp-buttons">
-                    
                     <button
                       onClick={() => {
                         setPdata((oldValue) => !oldValue);
@@ -225,7 +224,7 @@ const Profile = ({ history }) => {
                   className={`records ${record === "3" ? "lines" : ""}`}
                   onClick={() => {
                     setRecord("3");
-                    fetchUserUploads(); // Fetch user uploads when "Uploads" is clicked
+                    fetchUserUploads();
                   }}
                 >
                   Uploads

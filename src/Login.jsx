@@ -9,7 +9,7 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
 } from "firebase/auth";
-import { auth as firebaseAuth } from "./firebase"; // Ensure this path is correct
+import { auth as firebaseAuth } from "./firebase";
 
 const Login = ({ setlogin }) => {
   const navigate = useNavigate();
@@ -27,8 +27,8 @@ const Login = ({ setlogin }) => {
 
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        Cookies.set("userSession", "loggedIn", { expires: 7 }); // Expires in 7 day
-        Cookies.set("userEmail", email, { expires: 7 }); // Expires in 7 day
+        Cookies.set("userSession", "loggedIn", { expires: 7 });
+        Cookies.set("userEmail", email, { expires: 7 });
         setlogin(true);
         navigate("/Home");
       })
