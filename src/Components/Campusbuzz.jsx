@@ -224,7 +224,6 @@ const Campusbuzz = () => {
 };
 
 export default Campusbuzz;
-=======
 import React, { useState, useEffect } from "react";
 import Buzz from "./Buzz";
 import "../Css/home.css";
