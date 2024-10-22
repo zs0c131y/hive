@@ -11,7 +11,7 @@ const Updates = () => {
   const [email, setEmail] = useState(Cookies.get("userEmail") || "");
   const [name, setName] = useState("");
 
-  // Fetch the user's profile to get their name
+  // Fetch the user's name
   useEffect(() => {
     const fetchProfile = async () => {
       if (email) {
@@ -45,7 +45,7 @@ const Updates = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({}), // Empty body for POST
+        body: JSON.stringify({}),
       });
 
       if (!response.ok) {
@@ -61,7 +61,7 @@ const Updates = () => {
       // Map the fetched data to include author name
       const eventsWithAuthor = data.map((event) => ({
         ...event,
-        author: event.name, // Assuming the server returns `name` as the author's name
+        author: event.name,
       }));
 
       // Set the events state with the mapped events
@@ -73,7 +73,7 @@ const Updates = () => {
   };
 
   useEffect(() => {
-    fetchEvents(); // Fetch events when component mounts
+    fetchEvents();
   }, []);
 
   const handleSubmit = async (e) => {
@@ -109,7 +109,7 @@ const Updates = () => {
       }
 
       // Fetch updated events from the server
-      await fetchEvents(); // Ensure the event list is up-to-date from the server
+      await fetchEvents();
     } catch (error) {
       console.error("Error posting the event:", error);
     }
@@ -119,19 +119,17 @@ const Updates = () => {
     <>
       <div className="h-lr">
         <div className="request-boxes">
-          {/* Dynamically render Updatesbox components for each event */}
           {events.map((event, index) => (
             <Updatesbox
               key={index}
               title={event.title}
               description={event.description}
-              author={event.author} // Pass the author name here
-              func={() => setViewEvent(event)} // Set the event to view
+              author={event.author}
+              func={() => setViewEvent(event)}
             />
           ))}
         </div>
 
-        {/* Button to raise a new request */}
         <div
           onClick={() => {
             setraiseBuzz(true);
@@ -141,7 +139,6 @@ const Updates = () => {
           <img src="../Images/addreq.png" alt="Add Request" />
         </div>
 
-        {/* Form to create a new event */}
         {raisebuzz && (
           <div className="req-box-raise">
             <img className="buzz-img" src="../Images/buzz.png" alt="" />
@@ -185,7 +182,6 @@ const Updates = () => {
           </div>
         )}
 
-        {/* Display event details when View is clicked */}
         {viewEvent && (
           <div className="accept-box">
             <img src="../Images/pp.png" alt="Event" />

@@ -27,13 +27,17 @@ const App = () => {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LandingPage/>}/>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login setlogin={setlogin} />} />
           <Route path="/forgot-password" element={<Forgetpassword />} />
           <Route
             path="/Home"
             element={
-              login ? <Home addToHistory={addToHistory} /> : <Navigate to="/login" />
+              login ? (
+                <Home addToHistory={addToHistory} />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route

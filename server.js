@@ -4,7 +4,6 @@ const bodyParser = require("body-parser");
 const { MongoClient } = require("mongodb");
 const path = require("path");
 const nodemailer = require("nodemailer");
-const router = express.Router();
 const multer = require("multer");
 const fs = require("fs");
 const uploadDir = "./uploads";
@@ -15,7 +14,6 @@ dotenv.config();
 
 const app = express();
 const port = 3000;
-const secretKey = process.env.SECRET_KEY;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -39,7 +37,6 @@ async function connectToMongoDB() {
 
 void connectToMongoDB();
 
-// Ensure the uploads directory exists
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
@@ -145,7 +142,7 @@ app.put("/requests/update/:id", async (req, res) => {
   const db = client.db(dbName);
   const requests = db.collection("requests");
   const { id } = req.params; // Get the request ID from the URL
-  const { status, by, acceptedAt, byEmail } = req.body; // Get the new status and 'by' field from the request body
+  const { status, by, acceptedAt, byEmail } = req.body;
 
   if (!ObjectId.isValid(id)) {
     return res.status(400).send("Invalid ObjectId");
@@ -157,9 +154,9 @@ app.put("/requests/update/:id", async (req, res) => {
   if (status === "accepted") {
     updateFields = {
       status: "accepted",
-      acceptedAt: acceptedAt ? new Date(acceptedAt) : new Date(), // Store the time of acceptance
-      acceptedBy: by, // Store the name of the person who accepted the request
-      acceptedByEmail: byEmail, // Store the email of the person who accepted the request
+      acceptedAt: acceptedAt ? new Date(acceptedAt) : new Date(),
+      acceptedBy: by,
+      acceptedByEmail: byEmail,
     };
 
     // Fetch the request to get the user's email
@@ -169,7 +166,6 @@ app.put("/requests/update/:id", async (req, res) => {
       return res.status(404).json({ message: "Request not found" });
     }
 
-    // Check if the user is trying to accept their own request
     if (requestToAccept.email === byEmail) {
       return res
         .status(403)
@@ -193,9 +189,9 @@ app.put("/requests/update/:id", async (req, res) => {
   } else if (status === "rejected") {
     updateFields = {
       status: "rejected",
-      rejectedAt: new Date(), // Store the time of rejection
-      rejectedBy: by, // Store the name of the person who rejected the request
-      rejectedByEmail: byEmail, // Store the email of the person who rejected the request
+      rejectedAt: new Date(),
+      rejectedBy: by,
+      rejectedByEmail: byEmail,
     };
   }
 
@@ -284,7 +280,7 @@ app.post("/getbuzz", async (req, res) => {
   try {
     const recentEvents = await buzzEvents
       .find({ createdAt: { $gte: cutoffTime } })
-      .sort({ createdAt: -1 }) // Sort by createdAt in descending order
+      .sort({ createdAt: -1 })
       .toArray();
 
     res.status(200).json(recentEvents);
@@ -324,7 +320,7 @@ app.post("/requests/downloads", async (req, res) => {
   try {
     const downloadedRequests = await requests
       .find({ downloadedBy: email })
-      .sort({ createdAt: -1 }) // Sort by creation date
+      .sort({ createdAt: -1 })
       .toArray();
 
     res.json(downloadedRequests);
@@ -342,8 +338,8 @@ app.post("/requests/uploads", async (req, res) => {
 
   try {
     const uploadedRequests = await requests
-      .find({ email: email }) // Use the appropriate field to filter uploads
-      .sort({ createdAt: -1 }) // Sort by creation date
+      .find({ email: email })
+      .sort({ createdAt: -1 })
       .toArray();
 
     res.json(uploadedRequests);
@@ -362,7 +358,6 @@ app.post("/upload", upload.single("file"), async (req, res) => {
       return res.status(400).json({ message: "No file uploaded." });
     }
 
-    // Save the file details to the database if needed
     const db = client.db(dbName);
     const uploadsCollection = db.collection("uploads");
     const fileData = {
@@ -389,7 +384,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
   }
 });
 
-// Route to fetch all data from the 'dbank' collection
+// Route to fetch all data for databank
 app.post("/dbank", async (req, res) => {
   const db = client.db(dbName);
   const dbankCollection = db.collection("uploads");
@@ -423,7 +418,7 @@ app.post("/download", async (req, res) => {
         // Add the email to the list if it's not already there
         await filesCollection.updateOne(
           { path },
-          { $addToSet: { downloadedBy: email } } // Use $addToSet to prevent duplicates
+          { $addToSet: { downloadedBy: email } }
         );
         console.log(
           `Email ${email} added to the download history for path: ${path}`
@@ -500,7 +495,7 @@ app.post("/updates", async (req, res) => {
   try {
     const recentEvents = await updateCollection
       .find()
-      .sort({ createdAt: -1 }) // Sort by createdAt in descending order
+      .sort({ createdAt: -1 })
       .toArray();
 
     res.status(200).json(recentEvents);
@@ -510,6 +505,7 @@ app.post("/updates", async (req, res) => {
   }
 });
 
+// Wildcard route to serve index.html for all other routes
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
