@@ -1,6 +1,8 @@
 .main-container {
   height: 100vh;
   background-color: black;
+  display: flex;
+flex-direction: column;
 }
 .navbar {
   /* background-color:rebeccapurple; */
@@ -16,7 +18,8 @@
   justify-content: center;
   align-items: center;
   /* background-color: firebrick; */
-  height: 80vh;
+
+  flex: 1;
 }
 .auth {
   height: 450px;
@@ -168,4 +171,36 @@
 .continue {
   text-align: center;
   margin: 30px;
+}
+
+@media screen and (max-width:540px) {
+    .auth {
+        
+        width: 320px;
+        
+      }
+      .auth-common {
+        font-size: 15;
+        border-radius: 10px;
+      
+        padding: 10px 20px;
+        
+      }
+      .input-field {
+        padding: 15px 0;
+        font-size: 16px;
+        color: white;
+        padding-left: 20px;
+        width: 280px;
+        background-color: #171717;
+        border: none;
+        outline: none;
+        /* margin: 10px 0; */
+        border-radius: 30px;
+      }
+      .f-auth {
+        height: 350px;
+        width: 320px;
+        
+      }
 }

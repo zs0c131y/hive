@@ -27,10 +27,27 @@ const Login = ({ setlogin }) => {
 
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        Cookies.set("userSession", "loggedIn", { expires: 7 });
-        Cookies.set("userEmail", email, { expires: 7 });
-        setlogin(true);
-        navigate("/Home");
+        const user = userCredential.user;
+
+        // Check if the email is verified
+        if (user.emailVerified) {
+          Cookies.set("userSession", "loggedIn", { expires: 7 });
+          Cookies.set("userEmail", email, { expires: 7 });
+          setlogin(true);
+          navigate("/Home");
+        } else {
+          alert("Please verify your email before logging in.");
+          // Optionally, you can resend the verification email here
+          sendEmailVerification(user)
+            .then(() => {
+              alert(
+                "Verification email has been sent again. Please check your inbox."
+              );
+            })
+            .catch((error) => {
+              console.error("Error sending email verification:", error);
+            });
+        }
       })
       .catch((error) => {
         console.error("Login failed:", error.code, error.message);
