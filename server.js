@@ -284,7 +284,6 @@ app.post("/getbuzz", async (req, res) => {
   try {
     const recentEvents = await buzzEvents
       .find({ createdAt: { $gte: cutoffTime } })
-      .project({ title: 1, description: 1, createdAt: 1 })
       .sort({ createdAt: -1 }) // Sort by createdAt in descending order
       .toArray();
 
@@ -501,7 +500,6 @@ app.post("/updates", async (req, res) => {
   try {
     const recentEvents = await updateCollection
       .find()
-      .project({ title: 1, description: 1, createdAt: 1 }) // Select fields to include
       .sort({ createdAt: -1 }) // Sort by createdAt in descending order
       .toArray();
 

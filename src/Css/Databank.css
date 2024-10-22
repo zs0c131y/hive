@@ -1,44 +1,47 @@
-.db-container {
-  width: 90%;
-  /* height: auto; */
-
-  margin: 0 auto;
-  position: relative;
+.db-container{
+    width: 90%;
+    /* height: auto; */
+    
+    margin: 0 auto;
+    position: relative;
+    
 }
 
-.db-boxes {
-  display: flex;
-  /* background-color: wheat; */
+.db-boxes{
+    display: flex;
+    /* background-color: wheat; */
+
 }
-.databank-add-btn {
-  position: absolute;
-  bottom: 5%;
-  right: 5%;
+.databank-add-btn{
+    position: absolute;
+    bottom: 5%;
+    right: 5%;
 }
-.databank-add-btn img {
-  width: 70px;
-  height: 70px;
+.databank-add-btn img{
+    width: 70px;
+    height: 70px;
 }
-.db-box {
-  text-align: center;
-  margin: 0 20px;
-  width: 200px;
-  height: 200px;
-  background-color: #323232;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0 5px;
-  justify-content: space-evenly;
+.db-box{
+    text-align: center;
+    margin: 0 20px;
+    width: 200px;
+    height: 200px;
+    background-color: #323232;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 5px ;
+    justify-content: space-evenly;
 }
 
-.db-box img {
-  width: 90px;
-  height: 90px;
-  /* margin: 20px 0; */
+.db-box img{
+    width: 90px;
+    height: 90px;
+    /* margin: 20px 0; */
 }
 
-.db-box-title {
-  font-size: 15px;
+.db-box-title{
+    font-size: 15px;
+    
 }

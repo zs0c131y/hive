@@ -11,7 +11,7 @@ const Updates = () => {
   const [email, setEmail] = useState(Cookies.get("userEmail") || "");
   const [name, setName] = useState("");
 
-  // Fetch the user's name
+  // Fetch the user's profile to get their name
   useEffect(() => {
     const fetchProfile = async () => {
       if (email) {
@@ -37,7 +37,7 @@ const Updates = () => {
     fetchProfile();
   }, [email]);
 
-  // Fetch updates from the server when the component mounts
+  // Fetch events from the server when the component mounts
   const fetchEvents = async () => {
     try {
       const response = await fetch("/updates", {
@@ -45,7 +45,7 @@ const Updates = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({}),
+        body: JSON.stringify({}), // Empty body for POST
       });
 
       if (!response.ok) {
@@ -54,9 +54,18 @@ const Updates = () => {
 
       const data = await response.json();
       console.log("Fetched events:", data);
+      data.forEach((event) => {
+        console.log("Author name received:", event.name);
+      });
 
-      // Set the events state directly from the fetched data
-      setEvents(data);
+      // Map the fetched data to include author name
+      const eventsWithAuthor = data.map((event) => ({
+        ...event,
+        author: event.name, // Assuming the server returns `name` as the author's name
+      }));
+
+      // Set the events state with the mapped events
+      setEvents(eventsWithAuthor);
     } catch (error) {
       console.error("Error fetching events:", error);
       alert("An error occurred while fetching events. Please try again later.");
@@ -78,8 +87,10 @@ const Updates = () => {
       createdAt: new Date().toISOString(),
     };
 
-    setEvents((prevEvents) => [newEvent, ...prevEvents]);
+    // Immediately update the state for UI feedback
+    setEvents((prevEvents) => [newEvent, ...prevEvents]); // Add the new event at the top
 
+    // Reset the form fields
     setEventTitle("");
     setEventDescription("");
     setraiseBuzz(false);
@@ -97,7 +108,8 @@ const Updates = () => {
         throw new Error("Failed to post the event");
       }
 
-      await fetchEvents();
+      // Fetch updated events from the server
+      await fetchEvents(); // Ensure the event list is up-to-date from the server
     } catch (error) {
       console.error("Error posting the event:", error);
     }
@@ -107,16 +119,19 @@ const Updates = () => {
     <>
       <div className="h-lr">
         <div className="request-boxes">
+          {/* Dynamically render Updatesbox components for each event */}
           {events.map((event, index) => (
             <Updatesbox
               key={index}
               title={event.title}
               description={event.description}
-              func={() => setViewEvent(event)}
+              author={event.author} // Pass the author name here
+              func={() => setViewEvent(event)} // Set the event to view
             />
           ))}
         </div>
 
+        {/* Button to raise a new request */}
         <div
           onClick={() => {
             setraiseBuzz(true);
@@ -126,6 +141,7 @@ const Updates = () => {
           <img src="../Images/addreq.png" alt="Add Request" />
         </div>
 
+        {/* Form to create a new event */}
         {raisebuzz && (
           <div className="req-box-raise">
             <img className="buzz-img" src="../Images/buzz.png" alt="" />
@@ -169,6 +185,7 @@ const Updates = () => {
           </div>
         )}
 
+        {/* Display event details when View is clicked */}
         {viewEvent && (
           <div className="accept-box">
             <img src="../Images/pp.png" alt="Event" />
@@ -184,6 +201,7 @@ const Updates = () => {
                 Close
               </button>
             </div>
+            <div className="sendername">Posted by: {viewEvent.author}</div>
           </div>
         )}
       </div>

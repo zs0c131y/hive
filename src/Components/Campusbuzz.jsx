@@ -13,7 +13,7 @@ const Campusbuzz = () => {
   const [email, setEmail] = useState(Cookies.get("userEmail") || "");
   const [name, setName] = useState("");
 
-  // Fetch the user's name
+  // Fetch the user's profile to get their name
   useEffect(() => {
     const fetchProfile = async () => {
       if (email) {
@@ -47,7 +47,7 @@ const Campusbuzz = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({}),
+        body: JSON.stringify({}), // Empty body for POST
       });
 
       if (!response.ok) {
@@ -57,7 +57,13 @@ const Campusbuzz = () => {
       const data = await response.json();
       console.log("Fetched events:", data);
 
-      setEvents(data);
+      // Map events to include the author name correctly
+      const eventsWithAuthor = data.map((event) => ({
+        ...event,
+        author: event.name, // Assuming `name` is the author's name from the backend
+      }));
+
+      setEvents(eventsWithAuthor);
     } catch (error) {
       console.error("Error fetching events:", error);
       alert("An error occurred while fetching events. Please try again later.");
@@ -72,6 +78,7 @@ const Campusbuzz = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Optimistically add the new event to the UI at the beginning
     const newEvent = {
       title: eventTitle,
       description: eventDescription,
@@ -81,14 +88,16 @@ const Campusbuzz = () => {
     };
 
     // Add it to the state immediately at the top
-    setEvents((prevEvents) => [newEvent, ...prevEvents]);
-    setViewEvent(newEvent);
+    setEvents((prevEvents) => [newEvent, ...prevEvents]); // Prepend the new event
+    setViewEvent(newEvent); // View the new event immediately
 
+    // Reset the form fields
     setEventTitle("");
     setEventDescription("");
     setraiseBuzz(false);
 
     try {
+      // Now, try to update the backend
       const response = await fetch("/buzzupdate", {
         method: "POST",
         headers: {
@@ -103,7 +112,7 @@ const Campusbuzz = () => {
 
       const responseData = await response.json();
       console.log("Successfully posted event:", responseData);
-      await fetchEvents();
+      await fetchEvents(); // Fetch the updated events
     } catch (error) {
       console.error("Error posting the event:", error);
     }
@@ -113,16 +122,18 @@ const Campusbuzz = () => {
     <>
       <div className="h-lr">
         <div className="request-boxes">
+          {/* Dynamically render Buzz components for each event */}
           {events.map((event, index) => (
             <Buzz
               key={index}
               title={event.title}
               description={event.description}
-              func={() => setViewEvent(event)}
+              func={() => setViewEvent(event)} // Set the event to view
             />
           ))}
         </div>
 
+        {/* Button to raise a new request */}
         <div
           onClick={() => {
             setraiseBuzz(true);
@@ -132,8 +143,10 @@ const Campusbuzz = () => {
           <img src="../Images/addreq.png" alt="Add Request" />
         </div>
 
+        {/* Form to create a new event */}
         {raisebuzz && (
           <div className="req-box-raise">
+            {/* Conditionally render either the file name or the upload icon */}
             {uploadedFile ? (
               <div className="uploaded-file-name">{uploadedFile.name}</div>
             ) : (
@@ -142,15 +155,15 @@ const Campusbuzz = () => {
                 src="../Images/buzz.png"
                 alt=""
                 onClick={() => document.getElementById("file-upload").click()}
-                style={{ cursor: "pointer" }}
+                style={{ cursor: "pointer" }} // Makes it look clickable
               />
             )}
 
             <input
               type="file"
               id="file-upload"
-              style={{ display: "none" }}
-              onChange={(e) => setUploadedFile(e.target.files[0])}
+              style={{ display: "none" }} // Hides the file input
+              onChange={(e) => setUploadedFile(e.target.files[0])} // Handle the file upload
             />
 
             <form className="req-form" onSubmit={handleSubmit}>
@@ -194,6 +207,7 @@ const Campusbuzz = () => {
           </div>
         )}
 
+        {/* Display event details when View is clicked */}
         {viewEvent && (
           <div className="accept-box">
             <img src="../Images/pp.png" alt="Event" />
@@ -209,6 +223,7 @@ const Campusbuzz = () => {
                 Close
               </button>
             </div>
+            <div className="sendername">Posted by: {viewEvent.author}</div>
           </div>
         )}
       </div>
