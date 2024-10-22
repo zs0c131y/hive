@@ -1,171 +1,183 @@
-.main-container {
-  height: 100vh;
-  background-color: black;
+.main-container{
+    height: 100vh;
+    background-color: black;
 }
-.navbar {
-  /* background-color:rebeccapurple; */
-  padding: 25px 0;
-}
-.logo {
-  color: white;
-  font-size: 25px;
-  margin-left: 50px;
-}
-.main-auth-box {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  /* background-color: firebrick; */
-  height: 80vh;
-}
-.auth {
-  height: 450px;
-  width: 500px;
-  background-color: #1e1e1e;
-  position: relative;
-  border-radius: 5%;
-  transition: all 0.3s;
-}
-.f-auth {
-  height: 350px;
-  width: 500px;
-  background-color: #1e1e1e;
-  position: relative;
-  border-radius: 5%;
-  transition: all 0.3s;
-}
-.choice {
-  display: flex;
-  color: white;
-  background-color: #323232;
-  justify-content: space-around;
+.navbar{
+    /* background-color:rebeccapurple; */
+    padding: 25px 0;
 
-  width: min-content;
-  margin: 0 auto;
-  margin-top: 20px;
-  /* padding: 15px 0; */
-  cursor: pointer;
-  border-radius: 15px;
 }
-.auth-common {
-  font-size: 17px;
-  border-radius: 10px;
-
-  padding: 10px 50px;
-  margin: 8px;
+.logo{
+    color: white;
+    font-size: 25px;
+    margin-left: 50px;
 }
-
-.inputs {
-  display: flex;
-  flex-direction: column;
-  transition: all 0.3s;
-
-  justify-content: space-evenly;
-  height: 180px;
-  /* background-color: rgb(112, 85, 85); */
+.main-auth-box{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* background-color: firebrick; */
+    height: 80vh;
 }
-.auth-form {
-  /* background-color: firebrick; */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-top: 30px;
-  height: 300px;
-  transition: all 0.3s;
+.auth{
+    height: 450px;
+    width: 500px;
+    background-color: #1E1E1E;
+    position: relative;
+    border-radius: 5%;
+    transition: all 0.3s;
+
+}
+.f-auth{
+    height: 350px;
+    width: 500px;
+    background-color: #1E1E1E;
+    position: relative;
+    border-radius: 5%;
+    transition: all 0.3s;
+}
+.choice{
+    display: flex;
+    color: white;
+    background-color: #323232;
+    justify-content: space-around;
+    
+    width: min-content;
+    margin: 0 auto;
+    margin-top: 20px;
+    /* padding: 15px 0; */
+    cursor: pointer;
+    border-radius: 15px;
+
+}
+.auth-common{
+    font-size: 17px;
+    border-radius: 10px;
+    
+    padding: 10px 50px;
+    margin: 8px;
 }
 
-.input-field {
-  padding: 15px 0;
-  font-size: 16px;
-  color: white;
-  padding-left: 20px;
-  width: 350px;
-  background-color: #171717;
-  border: none;
-  outline: none;
-  /* margin: 10px 0; */
-  border-radius: 30px;
+
+.inputs{
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s;
+
+    justify-content: space-evenly;
+    height: 180px;
+    /* background-color: rgb(112, 85, 85); */
+}
+.auth-form{
+    /* background-color: firebrick; */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    height: 300px;
+    transition: all 0.3s;
+
 }
 
-.login-btn {
-  background-color: #171717;
-  color: white;
-  font-size: 18px;
-  padding: 10px 35px;
-  border-radius: 20px;
-  margin-top: 30px;
-  border: 0;
-  outline: 0;
-  cursor: pointer;
-}
-.forgot-pass {
-  text-align: center;
-}
-.forgot-pass a {
-  color: rgb(89, 88, 88);
-  text-decoration: none;
-  font-style: italic;
-}
-.hide {
-  display: none;
+.input-field{
+    padding: 15px 0;
+    font-size: 16px;
+    color: white;
+    padding-left: 20px;
+    width: 350px;
+    background-color: #171717;
+    border: none;
+    outline: none;
+    /* margin: 10px 0; */
+    border-radius: 30px;
 }
 
-.signcss {
-  height: 480px;
-  transition: all 0.3s;
+.login-btn{
+    background-color: #171717;
+    color: white;
+    font-size: 18px;
+    padding: 10px 35px;
+    border-radius: 20px;
+    margin-top: 30px;
+    border: 0;
+    outline: 0;
+    cursor: pointer;
 }
-.signcssinputs {
-  height: 250px;
-  transition: all 0.3s;
+.forgot-pass{
+    text-align: center;
+
 }
-.signcssform {
-  height: 350px;
-  transition: all 0.3s;
+.forgot-pass a{
+    color: rgb(89, 88, 88);
+    text-decoration: none;
+    font-style: italic;
+}
+.hide{
+    display: none;
 }
 
-.activelogin {
-  background-color: #1e1e1e;
+.signcss{
+    height: 480px;
+    transition: all 0.3s;
+}
+.signcssinputs{
+    height: 250px;
+    transition: all 0.3s;
+
+}
+.signcssform{
+    height: 350px;
+    transition: all 0.3s;
+
 }
 
-.activesignup {
-  background-color: #1e1e1e;
+.activelogin{
+    background-color: #1E1E1E;
 }
 
-.f-pass {
-  width: 280px;
-  margin: 0 auto;
-  background-color: #323232;
-  color: white;
-  text-align: center;
-  margin-top: 20px;
-  padding: 15px 0;
-  border-radius: 15px;
+.activesignup{
+    background-color: #1E1E1E;
 }
 
-.f-pass-form {
-  /* background-color: darkblue; */
-  display: flex;
-
-  margin-top: 30px;
-  flex-direction: column;
-  align-items: center;
-  height: 270px;
-  justify-content: center;
-  gap: 30px;
+.f-pass{
+    width: 280px;
+    margin: 0 auto;
+    background-color: #323232;
+    color: white;
+    text-align: center;
+    margin-top: 20px;
+    padding: 15px 0;
+    border-radius: 15px;
 }
 
-.continue button {
-  padding: 15px 25px;
-  font-size: 17px;
-  background-color: #171717;
-  color: white;
-  border: 0;
-  outline: 0;
-  border-radius: 15px;
-  cursor: pointer;
+.f-pass-form{
+    /* background-color: darkblue; */
+    display: flex;
+    
+    margin-top: 30px;
+    flex-direction: column;
+    align-items: center;
+    height: 270px;
+    justify-content: center;
+    gap: 30px;
 }
-.continue {
-  text-align: center;
-  margin: 30px;
+
+
+
+
+
+.continue button { 
+    padding: 15px 25px;
+    font-size: 17px;
+    background-color: #171717;
+    color: white;
+    border: 0;
+    outline: 0;
+    border-radius: 15px;
+    cursor: pointer;
+}
+.continue{
+    text-align: center;
+    margin: 30px;
 }
