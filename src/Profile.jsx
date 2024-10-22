@@ -15,7 +15,7 @@ const Profile = ({ history }) => {
   const [userHistory, setUserHistory] = useState([]);
   const [userRecords, setUserRecords] = useState([]);
   const [downloads, setDownloads] = useState([]);
-  const [uploads, setUploads] = useState([]);
+  const [uploads, setUploads] = useState([]); // State to hold upload records
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -48,7 +48,8 @@ const Profile = ({ history }) => {
       .then(() => {
         // Clear cookies
         Cookies.remove("userEmail");
-        Cookies.remove("userSession");
+        Cookies.remove("userSession"); // Ensure session cookie is cleared
+        // Redirect to the login page after logging out
         window.location.href = "/";
       })
       .catch((error) => {
@@ -122,6 +123,7 @@ const Profile = ({ history }) => {
     }
   };
 
+  // Fetch user uploads when "Uploads" is clicked
   const fetchUserUploads = async () => {
     try {
       const response = await fetch("/requests/uploads", {
@@ -134,7 +136,7 @@ const Profile = ({ history }) => {
 
       if (response.ok) {
         const data = await response.json();
-        // Extract titles and store them in the uploads state
+        // Extract titles and store them in the downloads state
         const title = data.map((upload) => upload.title);
         setUploads(title);
       } else {
@@ -167,7 +169,7 @@ const Profile = ({ history }) => {
                 <div className="profile-data">
                   <div className="pp-name">{profileName}</div>
                   <div className="pp-buttons">
-                    <button className="p-btn">Edit Profile</button>
+                    
                     <button
                       onClick={() => {
                         setPdata((oldValue) => !oldValue);
@@ -189,7 +191,7 @@ const Profile = ({ history }) => {
               >
                 {pdata && userRecords.length === 0 ? "No records." : null}
                 {pdata && userRecords.length > 0 && (
-                  <div className="user-records">
+                  <div className="">
                     {userRecords.map((record, index) => (
                       <History key={index} history={record} />
                     ))}
@@ -223,7 +225,7 @@ const Profile = ({ history }) => {
                   className={`records ${record === "3" ? "lines" : ""}`}
                   onClick={() => {
                     setRecord("3");
-                    fetchUserUploads();
+                    fetchUserUploads(); // Fetch user uploads when "Uploads" is clicked
                   }}
                 >
                   Uploads

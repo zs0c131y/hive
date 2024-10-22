@@ -15,7 +15,7 @@ const Forgetpassword = () => {
     try {
       await sendPasswordResetEmail(auth, email);
       alert("Reset link is sent to your email.");
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       alert(error.message);
     }
@@ -37,7 +37,7 @@ const Forgetpassword = () => {
                 className="input-field"
                 placeholder="Email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)} // Set email input
                 required
               />
 
