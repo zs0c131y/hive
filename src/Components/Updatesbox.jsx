@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 const Updatesbox = (props) => {
   return (
@@ -9,7 +9,7 @@ const Updatesbox = (props) => {
         View
       </button>
     </div>
-  )
-}
+  );
+};
 
-export default Updatesbox
+export default Updatesbox;
