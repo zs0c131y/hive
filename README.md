@@ -1,6 +1,6 @@
 # Project Hive
 
-**Hive** is a web application designed to enhance social interaction among university students. It allows users to send and receive requests for help related to university life and other needs. The app aims to foster connections between students who can assist each other, participate in discussions, and share knowledge, promoting a collaborative and growth-focused community.
+**Hive** is a web application designed to enhance social interaction among university students. It allows users to send and receive requests for help related to university life and other needs by posting it in feed. The app aims to foster connections between students who can assist each other, participate in discussions, and share knowledge, promoting a collaborative and growth-focused community.
 
 ## Features
 
@@ -81,6 +81,7 @@ hive/
    ```
 
 3. Set up Firebase:
+
    - Configure `firebase.js` with your Firebase project credentials.
 
 4. Start the development server:
